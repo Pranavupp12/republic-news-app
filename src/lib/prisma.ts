@@ -3,8 +3,6 @@ import { PrismaClient } from '@prisma/client';
 // This is a best practice for using Prisma with Next.js in development.
 // It prevents creating a new PrismaClient instance on every hot reload.
 declare global {
-  // allow global `var` declarations
-  // eslint-disable-next-line no-var
   var prisma: PrismaClient | undefined;
 }
 

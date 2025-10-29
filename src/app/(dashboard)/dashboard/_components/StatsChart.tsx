@@ -12,7 +12,7 @@ const COLORS = ['#8884d8', '#ffc658', '#82ca9d']; // Purple (Featured), Yellow (
 
 export function StatsChart({ totalArticles, featuredCount, trendingCount }: StatsChartProps) {
   const regularArticles = totalArticles - featuredCount - trendingCount;
-  
+
   const allData = [
     { name: 'Featured', value: featuredCount },
     { name: 'Trending', value: trendingCount },
@@ -35,15 +35,16 @@ export function StatsChart({ totalArticles, featuredCount, trendingCount }: Stat
             outerRadius={80}
             fill="#8884d8"
             dataKey="value"
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             label={(props: any) => `${props.name}: ${props.value}`}
           >
-            {data.map((entry, index) => (
+            {data.map((_,index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
         </PieChart>
       </ResponsiveContainer>
-      
+
       <div className="absolute bottom-4 left-0 right-0 text-center">
         <p className="text-sm font-medium">Total Articles: <span className="font-bold text-lg">{totalArticles}</span></p>
       </div>

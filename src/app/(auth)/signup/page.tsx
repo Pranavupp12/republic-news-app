@@ -28,6 +28,7 @@ export default function SignupPage() {
         toast.error( "Error",{ description: result.error });
       }
     } catch (error) {
+      console.error("Signup Submit Error:", error);
       toast.error("Error", { description: "An unexpected error occurred." });
     } finally {
       setIsLoading(false); // <-- Set loading false
