@@ -3,7 +3,6 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { v2 as cloudinary } from 'cloudinary';
-import Pusher from "pusher";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";   
 
@@ -70,6 +69,7 @@ export async function createWebStory(formData: FormData) {
    
     return { success: true };
   } catch (error) {
+    console.error("Create web story error:", error);
     return { success: false, error: "Failed to create story." };
   }
 }
@@ -108,6 +108,7 @@ export async function addSlideToStory(formData: FormData) {
         
         return { success: true };
     } catch (error) {
+        console.error("add slide to story error:", error);
         return { success: false, error: "Failed to add slide." };
     }
 }
@@ -155,6 +156,7 @@ export async function updateWebStory(storyId: string, formData: FormData) {
    
     return { success: true };
   } catch (error) {
+    console.error("update web story  error:", error);
     return { success: false, error: "Failed to update story." };
   }
 }
@@ -170,6 +172,7 @@ export async function deleteWebStory(storyId: string) {
 
     return { success: true };
   } catch (error) {
+    console.error("delete web story error:", error);
     return { success: false, error: "Failed to delete story." };
   }
 }
@@ -218,6 +221,7 @@ export async function updateSlide(slideId: string, formData: FormData) {
         
         return { success: true };
     } catch (error) {
+      console.error("update slide error:", error);
         return { success: false, error: "Failed to update slide." };
     }
 }
@@ -237,6 +241,7 @@ export async function deleteSlide(slideId: string) {
 
         return { success: true };
     } catch (error) {
+        console.error("delete slide error:", error);
         return { success: false, error: "Failed to delete slide." };
     }
 }

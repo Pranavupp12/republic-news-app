@@ -94,8 +94,10 @@ export async function createArticle(formData: FormData) {
   } catch (error) {
     console.error('Create article error:', error);
     // CHANGED: Added a check for unique constraint error (slug)
-    if ((error as any).code === 'P2002' && (error as any).meta?.target?.includes('slug')) {
-        return { success: false, error: "This URL slug is already taken. Please change it." };
+    if (typeof error === 'object' && error !== null && 'code' in error && error.code === 'P2002' && 
+      'meta' in error && typeof error.meta === 'object' && error.meta !== null && 'target' in error.meta && 
+      Array.isArray(error.meta.target) && error.meta.target.includes('slug')) {
+      return { success: false, error: "This URL slug is already taken. Please change it." };
     }
     return { success: false, error: "Failed to create article." };
   }
@@ -109,9 +111,9 @@ export async function deleteArticle(articleId: string) {
     await prisma.article.delete({ where: { id: articleId } });
     revalidatePath("/dashboard");
     revalidatePath("/");
-
     return { success: true };
   } catch (error) {
+    console.error("delete article error:", error);
     return { success: false, error: "Failed to delete article." };
   }
 }
@@ -197,9 +199,11 @@ export async function updateArticle(articleId: string, formData: FormData) {
   } catch (error) {
     console.error("Update article error:", error);
     // CHANGED: Added a check for unique constraint error (slug)
-    if ((error as any).code === 'P2002' && (error as any).meta?.target?.includes('slug')) {
-        return { success: false, error: "This URL slug is already taken. Please change it." };
-    }
+    if (typeof error === 'object' && error !== null && 'code' in error && error.code === 'P2002' && 
+      'meta' in error && typeof error.meta === 'object' && error.meta !== null && 'target' in error.meta && 
+      Array.isArray(error.meta.target) && error.meta.target.includes('slug')) {
+      return { success: false, error: "This URL slug is already taken. Please change it." };
+  }
     return { success: false, error: "Failed to update the article." };
   }
 }
@@ -247,6 +251,7 @@ export async function toggleFeaturedStatus(articleId: string, isFeatured: boolea
 
     return { success: true };
   } catch (error) {
+    console.error("Toggle featured status error:", error);
     return { success: false, error: "Failed to update featured status." };
   }
 }
@@ -310,6 +315,7 @@ export async function toggleTrendingStatus(
 
     return { success: true };
   } catch (error) {
+    console.error("Toggle trending status error:", error);
     return { success: false, error: "Failed to update trending status." };
   }
 }

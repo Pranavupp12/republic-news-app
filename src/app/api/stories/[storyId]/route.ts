@@ -26,6 +26,7 @@ export async function GET(
 
     return NextResponse.json(story);
   } catch (error) {
+    console.error("Error fetching story:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

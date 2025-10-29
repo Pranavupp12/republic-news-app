@@ -101,7 +101,7 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
         <DialogHeader>
           <DialogTitle>Update Article</DialogTitle>
           <DialogDescription>
-            Make changes to your article here. Click save when you're done.
+            Make changes to your article here. Click save when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
         

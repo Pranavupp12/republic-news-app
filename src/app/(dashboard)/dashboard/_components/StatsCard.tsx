@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/card";
 import type { Article } from '@prisma/client';
 import {
-  Newspaper, Star, CheckCircle, TrendingUp,
+  Newspaper, Star, TrendingUp,
 } from 'lucide-react';
 import { StatsChart } from "./StatsChart";
 

@@ -11,9 +11,10 @@ import UnderlineExtension from '@tiptap/extension-underline';
 import LinkExtension from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import { useState, useEffect } from 'react';
+import { Editor } from '@tiptap/react'
 
 // --- A simple, custom toolbar ---
-const MenuBar = ({ editor }: { editor: any }) => {
+const MenuBar = ({ editor }: { editor: Editor | null }) => {
   if (!editor) {
     return null;
   }
@@ -86,7 +87,7 @@ interface RichTextEditorProps {
 }
 
 export function RichTextEditor({ value, onChange, onBlur }: RichTextEditorProps) {
-  const [_, setForceUpdate] = useState(0);
+  const [, setForceUpdate] = useState(0);
 
   const editor = useEditor({
     extensions: [

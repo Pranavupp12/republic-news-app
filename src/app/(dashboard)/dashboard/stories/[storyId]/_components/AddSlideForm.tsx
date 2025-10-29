@@ -37,7 +37,7 @@ export function AddSlideForm({ storyId, storyTitle }: AddSlideFormProps) {
     
     return (
         <Card>
-            <CardHeader><CardTitle>Add New Slide to "{storyTitle}"</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Add New Slide to &quot;{storyTitle}&quot;</CardTitle></CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <input type="hidden" name="storyId" value={storyId} />

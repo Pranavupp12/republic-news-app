@@ -67,7 +67,7 @@ export function UpdateStoryModal({ isOpen, onClose, story }: UpdateStoryModalPro
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Update Web Story</DialogTitle>
-          <DialogDescription>Make changes to your story here. Click save when you're done.</DialogDescription>
+          <DialogDescription>Make changes to your story here. Click save when you&apos;re done.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-2">

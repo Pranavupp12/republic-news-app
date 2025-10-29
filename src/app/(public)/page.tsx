@@ -136,7 +136,7 @@ export default async function HomePage(props: HomePageProps) {
         <div className="lg:col-span-2">
           <Card>
             <CardContent className="px-4 pt-5 pb-5">
-              <h2 className="text-2xl font-bold font-heading mb-2 text-center"><span className="text-red-500">Today's</span> Headlines</h2>
+              <h2 className="text-2xl font-bold font-heading mb-2 text-center"><span className="text-red-500">Today&apos;s</span> Headlines</h2>
               {todaysArticles.length > 0 ? (
                 <div className="space-y-8 max-h-[740px] overflow-y-auto hide-scrollbar">
                   {todaysArticles.map((article) => (

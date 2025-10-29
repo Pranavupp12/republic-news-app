@@ -9,7 +9,7 @@ interface StorySlideComponentProps {
 
 }
 
-export function StorySlideComponent({ slide, storyTitle, authorName, publishedDate }: StorySlideComponentProps) {
+export function StorySlideComponent({ slide, authorName, publishedDate }: StorySlideComponentProps) {
   return (
     <div className="relative w-full h-full bg-black rounded-lg">
       {/* Image Container */}

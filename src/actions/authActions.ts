@@ -20,6 +20,7 @@ export async function handleSignUp(formData: FormData) {
     await prisma.user.create({ data: { name, email, password: hashedPassword } });
     return { success: true };
   } catch (error) {
+    console.error("Signup Error:", error);
     return { success: false, error: "Something went wrong." };
   }
 }

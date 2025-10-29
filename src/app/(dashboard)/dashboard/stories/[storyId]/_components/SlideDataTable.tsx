@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import Image from 'next/image';
@@ -19,15 +18,6 @@ interface SlideDataTableProps {
   slides: StorySlide[];
   authorName: string;
 }
-
-// Helper function to truncate text by word count
-const truncateText = (text: string, wordLimit: number) => {
-  const words = text.split(' ');
-  if (words.length > wordLimit) {
-    return words.slice(0, wordLimit).join(' ') + '...';
-  }
-  return text;
-};
 
 export function SlideDataTable({ slides, authorName }: SlideDataTableProps) {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);

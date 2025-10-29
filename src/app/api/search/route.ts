@@ -57,6 +57,7 @@ export async function GET(req: Request) {
     return NextResponse.json(finalResults);
 
   } catch (error) {
+    console.error("Search API Error:", error);
     return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
   }
 }
