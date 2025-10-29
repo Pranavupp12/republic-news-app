@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import type { Metadata } from 'next'; // ADDED: Import Metadata type
+import { format } from 'date-fns-tz';
 
 // CHANGED: Interface now expects 'slug' instead of 'articleId'
 interface ArticlePageProps {
@@ -72,11 +73,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) { // CHA
           <span>By {article.author?.name || 'Anonymous'}</span>
           <span className="mx-2 text-muted-foreground">•</span>
           <span>
-            {new Date(article.createdAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
+            {format(new Date(article.createdAt), 'MMMM d, yyyy', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone })}
           </span>
         </div>
 

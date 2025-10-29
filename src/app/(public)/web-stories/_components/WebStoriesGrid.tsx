@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Pusher from 'pusher-js';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { WebStory } from '@prisma/client';
+import { format } from 'date-fns-tz';
 
 interface WebStoriesGridProps {
   initialStories: WebStory[];
@@ -13,28 +12,6 @@ interface WebStoriesGridProps {
 
 export function WebStoriesGrid({ initialStories }: WebStoriesGridProps) {
   const router = useRouter();
-
-  useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_PUSHER_KEY || !process.env.NEXT_PUBLIC_PUSHER_CLUSTER) {
-      console.error("Pusher environment variables are not set!");
-      return;
-    }
-
-    const pusherClient = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-    });
-
-    const channel = pusherClient.subscribe('stories-channel');
-
-    channel.bind('stories-updated', () => {
-      router.refresh();
-    });
-
-    return () => {
-      pusherClient.unsubscribe('stories-channel');
-      pusherClient.disconnect();
-    };
-  }, [router]);
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
@@ -52,11 +29,7 @@ export function WebStoriesGrid({ initialStories }: WebStoriesGridProps) {
           <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-col items-start text-left">
             <p className="text-white font-bold text-sm mb-1 line-clamp-2">{story.title}</p>
             <p className="text-white/80 text-xs">
-              {new Date(story.createdAt).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-              })}
+            {format(new Date(story.createdAt), 'MMM d, yyyy', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone })}
             </p>
           </div>
         </Link>

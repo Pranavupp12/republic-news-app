@@ -8,6 +8,7 @@ import { FeaturedArticleCard } from "./_components/FeaturedArticleCard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { Metadata } from 'next';
+import { format } from 'date-fns-tz';
 
 export const metadata: Metadata = {
   title: "Republic News - Latest US News & Breaking Headlines",
@@ -94,10 +95,7 @@ export default async function HomePage(props: HomePageProps) {
                           <span>{article.author?.name || 'Anonymous'}</span>
                           <span className="mx-2 text-muted-foreground">|</span>
                           <span>
-                            {new Date(article.createdAt).toLocaleString('en-US', {
-                              dateStyle: 'medium',
-                              timeStyle: 'short',
-                            })}
+                            {format(new Date(article.createdAt), 'MMM d, yyyy, h:mm a', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone })}
                           </span>
                         </p>
 

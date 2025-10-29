@@ -3,13 +3,13 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Pusher from 'pusher-js';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from '@/lib/utils'; // Import cn utility
 import type { Article, User } from '@prisma/client';
+import { format } from 'date-fns-tz';
 
 type ArticleWithAuthor = Article & {
   author: User | null;
@@ -23,31 +23,6 @@ interface NewsGridProps {
 export function NewsGrid({ initialArticles, columns = 3 }: NewsGridProps) {
   const router = useRouter();
   
-  useEffect(() => {
-    // Ensure these environment variables are correct and prefixed with NEXT_PUBLIC_
-    if (!process.env.NEXT_PUBLIC_PUSHER_KEY || !process.env.NEXT_PUBLIC_PUSHER_CLUSTER) {
-        console.error("Pusher environment variables are not set!");
-        return;
-    }
-
-    const pusherClient = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER,
-    });
-
-    const channel = pusherClient.subscribe('news-channel');
-
-    channel.bind('articles-updated', () => {
-      // This function refreshes the data for the current page
-      router.refresh();
-    });
-
-   return () => {
-      pusherClient.unsubscribe('news-channel');
-      // Explicitly disconnect the client to prevent zombie connections
-      pusherClient.disconnect();
-    };
-  }, [router]);
-
   // Dynamically set the grid columns class
   const gridClass = cn(
     "grid grid-cols-1 md:grid-cols-2 gap-8",
@@ -80,7 +55,7 @@ export function NewsGrid({ initialArticles, columns = 3 }: NewsGridProps) {
             <div className="text-sm text-red-500 mt-auto">
               <span>{article.author?.name || 'Anonymous'}</span>
               <span className="mx-2 text-muted-foreground">|</span>
-              <span>{new Date(article.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</span>
+              <span>{format(new Date(article.createdAt), 'MMM d, yyyy, h:mm a', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone })}</span>
             </div>
           </CardContent>
         </Card>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { format } from 'date-fns-tz';
 
 type ArticleWithAuthor = Article & {
   author: User | null;
@@ -32,10 +33,7 @@ export function FeaturedArticleCard({ article }: FeaturedArticleCardProps) {
       
         <div className="text-xs text-red-500 mt-auto">
           <span>
-            Published at {new Date(article.createdAt).toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              minute: '2-digit',
-            })}
+            Published at {format(new Date(article.createdAt), 'h:mm a', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone })}
           </span>
         </div>
       </CardContent>

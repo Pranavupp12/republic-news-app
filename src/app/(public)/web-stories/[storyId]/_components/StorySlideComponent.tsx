@@ -1,5 +1,6 @@
 import type { StorySlide } from '@prisma/client';
 import Image from 'next/image';
+import { format } from 'date-fns-tz';
 
 interface StorySlideComponentProps {
   slide: StorySlide;
@@ -30,11 +31,7 @@ export function StorySlideComponent({ slide, authorName, publishedDate }: StoryS
             {slide.caption}
           </p>
           <p className="text-white/80 text-xs mt-2">
-            By {authorName} | Published {new Date(publishedDate).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-            })}
+            By {authorName} | Published {format(new Date(publishedDate), 'MMM d, yyyy', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone })}
           </p>
         </div>
       )}

@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { PaginationControls } from "@/components/ui/PaginationControls";
 import type { Metadata } from 'next';
+import { format } from 'date-fns-tz';
 
 const ARTICLES_PER_PAGE = 6;
 
@@ -71,7 +72,7 @@ export default async function CategoryPage(props: CategoryPageProps) {
                 <div className="text-sm text-red-500 mt-auto">
                   <span>{article.author?.name || 'Anonymous'}</span>
                   <span className="mx-2 text-muted-foreground">|</span>
-                  <span>{new Date(article.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</span>
+                  <span>{format(new Date(article.createdAt), 'MMM d, yyyy, h:mm a', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone })}</span>
                 </div>
               </CardContent>
             </Card>
