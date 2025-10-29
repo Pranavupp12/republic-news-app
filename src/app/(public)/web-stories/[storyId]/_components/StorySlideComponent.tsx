@@ -1,3 +1,5 @@
+'use client';
+
 import type { StorySlide } from '@prisma/client';
 import Image from 'next/image';
 import { format } from 'date-fns-tz';
