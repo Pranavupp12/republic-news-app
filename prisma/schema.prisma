@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = "mongodb+srv://pranavuppal23:newpass12@cluster0.agxnsct.mongodb.net/news-portal?retryWrites=true&w=majority&appName=Cluster0"
+}
+
+model User {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String?
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  articles  Article[]
+  webStories WebStory[] 
+}
+
+model Article {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  content   String
+  imageUrl  String
+  category  String
+  slug            String?   @unique
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String?
+  isFeatured Boolean  @default(false)
+  isTrending    Boolean  @default(false)    
+  trendingTopic String?  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String   @db.ObjectId
+}
+
+model WebStory {
+  id         String       @id @default(auto()) @map("_id") @db.ObjectId
+  title      String
+  coverImage String
+  createdAt  DateTime     @default(now())
+  slides     StorySlide[] 
+  author     User         @relation(fields: [authorId], references: [id]) 
+  authorId   String       @db.ObjectId                                   
+}
+
+
+model StorySlide {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  imageUrl  String
+  caption   String?
+  createdAt DateTime @default(now())
+  story     WebStory @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  storyId   String   @db.ObjectId
+}
