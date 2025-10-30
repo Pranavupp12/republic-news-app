@@ -51,14 +51,6 @@ export default async function CategoryPage(props: CategoryPageProps) {
 
   const totalPages = Math.ceil(totalArticles / ARTICLES_PER_PAGE);
 
-  // If page > 1 and no articles, potentially redirect or show 404,
-  // but Prisma handles empty array fine.
-  // A check for page > totalPages might be good here too.
-
-  // Optional: Check if the category itself is valid, though an empty list handles it.
-   if (totalArticles === 0 && Number(page) === 1) {
-     notFound(); // Or just let it render the "No articles" message
-   }
 
   return (
     <main className="container mx-auto py-10 px-4">
@@ -68,9 +60,6 @@ export default async function CategoryPage(props: CategoryPageProps) {
         </p>
       ) : (
         <>
-          <h1 className="text-3xl md:text-4xl font-bold font-heading mb-8 text-center capitalize">
-            {categoryName} News
-          </h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Use the ArticleCard Client Component to render each article */}
             {articles.map((article) => (
