@@ -29,6 +29,7 @@ export default function LoginPage() {
         router.push("/dashboard");
       }
     } catch (error) {
+      console.error("Login Submit Error:", error);
       toast.error("Error", { description: "An unexpected error occurred." });
     } finally {
       setIsLoading(false); // <-- Set loading false

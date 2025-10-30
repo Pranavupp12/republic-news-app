@@ -1,3 +1,4 @@
+
 import { prisma } from "@/lib/prisma";
 import { NewsGrid } from "./_components/NewsGrid";
 import { PaginationControls } from "@/components/ui/PaginationControls";
