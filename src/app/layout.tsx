@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   },
   description: 'Your daily source for breaking news and headlines from the United States.',
   keywords: ['us news', 'american news', 'republic news', 'headlines', 'politics'],
+  robots: {
+    index: false,
+    follow: false, // Prevents following links as well
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
