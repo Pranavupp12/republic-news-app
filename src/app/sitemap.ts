@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { prisma } from '@/lib/prisma'; // Or your prisma client path
 
 // IMPORTANT: Replace this with your actual, live website domain
-const URL = "https://republicnewss.netlify.app";
+const URL = "https://republicnews.us";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   

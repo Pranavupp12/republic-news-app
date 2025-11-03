@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma"; // Or your prisma client path
 import RSS from "rss";
 
 // IMPORTANT: Replace this with your actual, live domain
-const YOUR_DOMAIN = "https://republicnewss.netlify.app";
+const YOUR_DOMAIN = "https://republicnews.us";
 
 export async function GET() {
   const feed = new RSS({
