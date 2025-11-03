@@ -1,4 +1,4 @@
-
+// src/components/ArticleCard.tsx (or similar path)
 'use client'; 
 
 import type { Article, User } from '@prisma/client';
@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from 'date-fns-tz';
+import { useState, useEffect } from 'react'; // <-- 1. Import hooks
 
 // Define the expected prop type
 type ArticleWithAuthor = Article & {
@@ -18,6 +19,19 @@ interface ArticleCardProps {
 }
 
 export function ArticleCard({ article }: ArticleCardProps) {
+  // 2. Add state for the formatted date
+  const [formattedDate, setFormattedDate] = useState('');
+
+  // 3. Use useEffect to format date only on the client-side
+  useEffect(() => {
+    // This code only runs in the browser, after hydration
+    setFormattedDate(
+      format(new Date(article.createdAt), 'MMM d, yyyy, h:mm a', { 
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone 
+      })
+    );
+  }, [article.createdAt]); // Re-run if the article prop changes
+
   return (
     <Card key={article.id} className="flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
       <CardHeader className="p-0 relative">
@@ -27,7 +41,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
             alt={article.title}
             fill
             style={{ objectFit: "cover" }}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Assuming 3 columns, adjust if needed
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         </Link>
         <Badge variant="default" className="absolute top-3 right-3">{article.category}</Badge>
@@ -37,11 +51,12 @@ export function ArticleCard({ article }: ArticleCardProps) {
           <Link href={`/article/${article.slug}`} className="hover:text-primary transition-colors">{article.title}</Link>
         </CardTitle>
         <p className="text-muted-foreground mb-4 flex-grow line-clamp-3">{article.metaDescription}</p>
-        <div className="text-sm text-red-500 mt-auto"> {/* Use muted-foreground for consistency */}
+        <div className="text-sm text-red-500 mt-auto">
           <span>{article.author?.name || 'Anonymous'}</span>
           <span className="mx-2 text-muted-foreground">|</span>
-          {/* Date formatting happens here, on the client */}
-          <span>{format(new Date(article.createdAt), 'MMM d, yyyy, h:mm a', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone })}</span>
+          {/* 4. Display the state variable. It will be empty on server-render
+               and update on client-mount, avoiding the mismatch. */}
+          <span>{formattedDate || '...'}</span> 
         </div>
       </CardContent>
     </Card>

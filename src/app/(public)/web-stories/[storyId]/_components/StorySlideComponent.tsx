@@ -3,16 +3,29 @@
 import type { StorySlide } from '@prisma/client';
 import Image from 'next/image';
 import { format } from 'date-fns-tz';
+import { useState, useEffect } from 'react'; // <-- 1. Import hooks
 
 interface StorySlideComponentProps {
   slide: StorySlide;
   storyTitle: string;
   authorName: string;
   publishedDate: Date;
-
 }
 
 export function StorySlideComponent({ slide, authorName, publishedDate }: StorySlideComponentProps) {
+  // 2. Add state for the formatted date
+  const [formattedDate, setFormattedDate] = useState('');
+
+  // 3. Use useEffect to format date only on the client-side
+  useEffect(() => {
+    // This code only runs in the browser, after hydration
+    setFormattedDate(
+      format(new Date(publishedDate), 'MMM d, yyyy', { 
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone 
+      })
+    );
+  }, [publishedDate]); // Re-run if the prop changes
+
   return (
     <div className="relative w-full h-full bg-black rounded-lg">
       {/* Image Container */}
@@ -33,7 +46,8 @@ export function StorySlideComponent({ slide, authorName, publishedDate }: StoryS
             {slide.caption}
           </p>
           <p className="text-white/80 text-xs mt-2">
-            By {authorName} | Published {format(new Date(publishedDate), 'MMM d, yyyy', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone })}
+            By {authorName} | Published {/* 4. Display the state variable */}
+            {formattedDate || '...'}
           </p>
         </div>
       )}
