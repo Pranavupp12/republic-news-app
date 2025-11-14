@@ -12,7 +12,7 @@ export default function PrivacyPolicyPage() {
       <div className="max-w-none">
         <p className='text-sm mb-2'><span className='font-bold'>Last updated</span> : September 19, 2025</p>
         <p className='text-sm mb-4'>
-          Your privacy is important to us. It is Dash News's policy to respect your privacy
+          Your privacy is important to us. It is Dash News&apos;s policy to respect your privacy
           regarding any information we may collect from you across our website.
         </p>
         <h1 className="text-xl md:text-3xl font-bold mb-4">1. Information We Collect</h1>
