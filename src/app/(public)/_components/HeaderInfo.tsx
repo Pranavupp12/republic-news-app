@@ -65,7 +65,7 @@ export function HeaderInfo() {
   }, []);
 
   return (
-     <div className="hidden md:flex items-center text-sm text-muted-foreground">
+     <div className="hidden md:flex items-center text-xs lg:text-sm text-muted-foreground">
       <span>{date}</span>
       <span className="mx-2">|</span>
       <div className="flex items-center">

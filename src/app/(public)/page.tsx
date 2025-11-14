@@ -75,7 +75,7 @@ export default async function HomePage(props: HomePageProps) {
   });
 
   return (
-    <main className="container mx-auto py-10 px-4">
+    <main className="container mx-auto py-10 px-10 md:px-4">
       {/* --- TOP SECTION --- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -132,9 +132,9 @@ export default async function HomePage(props: HomePageProps) {
         </div>
 
         {/* --- SWAPPED: RIGHT COLUMN IS NOW TODAY'S HEADLINES --- */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 ">
           <Card>
-            <CardContent className="px-4 pt-5 pb-5">
+            <CardContent className=" pt-5 pb-5">
               <h2 className="text-2xl font-bold font-heading mb-2 text-center"><span className="text-red-500">Today&apos;s</span> Headlines</h2>
               {todaysArticles.length > 0 ? (
                 <div className="space-y-8 max-h-[740px] overflow-y-auto hide-scrollbar">

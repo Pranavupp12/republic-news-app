@@ -42,6 +42,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
             fill
             style={{ objectFit: "cover" }}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority
           />
         </Link>
         <Badge variant="default" className="absolute top-3 right-3">{article.category}</Badge>

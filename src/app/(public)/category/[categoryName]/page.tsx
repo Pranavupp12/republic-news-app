@@ -15,7 +15,8 @@ interface CategoryPageProps {
 
 // generateMetadata function (Server-Only)
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
-  const categoryName = params.categoryName;
+  const awaitedParams = await params;
+  const categoryName = awaitedParams.categoryName;
 
   // Helper to capitalize the first letter
   const formattedCategory = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
@@ -31,9 +32,12 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 export default async function CategoryPage(props: CategoryPageProps) {
   const ARTICLES_PER_PAGE = 6; // Define articles per page here or import from a config
 
+  const awaitedParams = await props.params;
+  const awaitedSearchParams = await props.searchParams;
+
   // Await params and searchParams directly
-  const categoryName = decodeURIComponent(props.params.categoryName);
-  const page = props.searchParams.page ?? '1';
+  const categoryName = decodeURIComponent(awaitedParams.categoryName);
+  const page = awaitedSearchParams.page ?? '1';
 
   // Fetch articles for the current page
   const articles = await prisma.article.findMany({
@@ -53,7 +57,7 @@ export default async function CategoryPage(props: CategoryPageProps) {
 
 
   return (
-    <main className="container mx-auto py-10 px-4">
+    <main className="container mx-auto py-10 px-10 md:px-4">
       {articles.length === 0 ? (
         <p className="text-center text-muted-foreground mt-10 text-lg">
           No articles found in the category yet.

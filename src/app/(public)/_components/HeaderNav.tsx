@@ -20,7 +20,7 @@ export function HeaderNav() {
   const pathname = usePathname();
 
   return (
-    <div className="hidden md:flex gap-x-6">
+    <div className="md:flex gap-x-6">
       {navLinks.map((link) => {
         const isActive = pathname === link.href;
         return (
@@ -28,7 +28,7 @@ export function HeaderNav() {
             key={link.name}
             href={link.href}
             className={cn(
-              "text-sm font-medium transition-colors hover:text-red-500",
+              "text-sm p-1 md:p-0 font-medium transition-colors hover:text-red-500 ",
               isActive ? "text-red-500" : "text-red-300"
             )}
           >

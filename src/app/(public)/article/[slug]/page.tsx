@@ -17,8 +17,10 @@ interface ArticlePageProps {
 //
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   // Fetch the article by slug
+  const awaitedParams = await params;
+
   const article = await prisma.article.findUnique({
-    where: { slug: params.slug },
+    where: { slug: awaitedParams.slug },
   });
 
   if (!article) {
@@ -44,11 +46,14 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 //
 // 2. Your updated Page Component
 //
-export default async function ArticlePage({ params }: ArticlePageProps) { // CHANGED: Props
+export default async function ArticlePage(props: ArticlePageProps) { // CHANGED: Props
+
+  const awaitedParams = await props.params;
+  const { slug } = awaitedParams;
   
   // CHANGED: Fetch by slug
   const article = await prisma.article.findUnique({
-    where: { slug: params.slug }, // Use the slug from the URL
+    where: { slug }, // Use the slug from the URL
     include: { author: true },
   });
 
@@ -58,18 +63,18 @@ export default async function ArticlePage({ params }: ArticlePageProps) { // CHA
   }
 
   return (
-    <main className="container mx-auto py-10 px-4 max-w-4xl">
+    <main className="container mx-auto py-10 px-10 md:px-0 max-w-4xl">
       <article>
         {/* Category Badge */}
         <Badge variant="default">{article.category}</Badge>
 
         {/* Title (this is the <h1>, metadata handles the <title>) */}
-        <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight my-4">
+        <h1 className="text-3xl lg:text-5xl font-extrabold tracking-tight my-4">
           {article.title}
         </h1>
 
         {/* Metadata: Author and Date */}
-        <div className="text-lg text-red-500 mb-8">
+        <div className="text-md md:text-lg text-red-500 mb-8">
           <span>By {article.author?.name || 'Anonymous'}</span>
           <span className="mx-2 text-muted-foreground">•</span>
           <span>

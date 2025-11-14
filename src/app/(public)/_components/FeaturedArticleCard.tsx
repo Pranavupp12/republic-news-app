@@ -31,8 +31,28 @@ export function FeaturedArticleCard({ article }: FeaturedArticleCardProps) {
   }, [article.createdAt]); // Re-run if the article prop changes
 
   return (
-    <Card className="flex flex-col md:flex-row overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
-      
+    <Card className="flex flex-col md:flex-row overflow-hidden  transition-shadow duration-300">
+
+       {/* Right Side: Image */}
+      <div className="relative w-full h-48 md:h-auto md:w-1/2 min-h-[200px] md:min-h-0 p-3 md:order-last">
+        <Link href={`/article/${article.slug}`} className="block w-full h-full relative">
+          <Image
+            src={article.imageUrl || "https://placehold.co/600x400"}
+            alt={article.title}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover rounded-md"
+            priority
+          />
+        </Link>
+        <Badge
+          variant="default"
+          className="absolute top-5 right-5 z-10"
+        >
+          {article.category}
+        </Badge>
+      </div>
+
       {/* Left Side: Text Content */}
       <CardContent className="flex flex-col p-3 w-full md:w-1/2">
         <h2 className="text-xl font-bold font-heading mb-2">
@@ -51,25 +71,6 @@ export function FeaturedArticleCard({ article }: FeaturedArticleCardProps) {
           </span>
         </div>
       </CardContent>
-
-      {/* Right Side: Image */}
-      <div className="relative w-full md:w-1/2 min-h-[200px] md:min-h-0 p-3">
-        <Link href={`/article/${article.slug}`} className="block w-full h-full relative">
-          <Image
-            src={article.imageUrl || "https://placehold.co/600x400"}
-            alt={article.title}
-            fill
-            sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover rounded-md"
-          />
-        </Link>
-        <Badge
-          variant="default"
-          className="absolute top-5 right-5 z-10"
-        >
-          {article.category}
-        </Badge>
-      </div>
     </Card>
   );
 }
