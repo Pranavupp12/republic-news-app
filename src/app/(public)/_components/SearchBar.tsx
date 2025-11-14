@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import debounce from 'lodash.debounce';
 
 interface ArticleSearchResult {
-    id: string;
+    slug: string;
     title: string;
     category: string;
 }
@@ -55,8 +55,9 @@ export function SearchBar() {
     fetchResults(query);
   }, [query, fetchResults]);
   
-  const handleSelect = (articleId: string) => {
-    router.push(`/article/${articleId}`);
+  // THE FIX: Function now accepts a 'slug' and navigates to the correct URL
+  const handleSelect = (slug: string) => {
+    router.push(`/article/${slug}`);
     setOpen(false);
   };
 
@@ -84,8 +85,8 @@ export function SearchBar() {
             <CommandGroup heading="Articles">
               {results.map((article) => (
                 <CommandItem
-                  key={article.id}
-                  onSelect={() => handleSelect(article.id)}
+                  key={article.slug}
+                  onSelect={() => handleSelect(article.slug)}
                   value={article.title}
                 >
                   {article.title}
