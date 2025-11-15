@@ -103,7 +103,7 @@ export function WebStoryManager({ stories, currentPage, articlesPerPage, totalPa
 
             <div className="grid grid-cols-1 gap-8">
                 <section>
-                    <Card>
+                    <Card className='rounded-md p-5'>
                         <CardHeader><CardTitle>Create New Web Story</CardTitle></CardHeader>
                         <CardContent>
                             <form onSubmit={handleCreateSubmit} className="space-y-4">

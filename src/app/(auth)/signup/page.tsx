@@ -35,7 +35,7 @@ export default function SignupPage() {
     }
   };
   return (
-    <Card className="mx-auto w-full max-w-md">
+    <Card className="mx-auto w-full max-w-md p-3 rounded-xl">
       <CardHeader><CardTitle className="text-xl">Sign Up</CardTitle><CardDescription>Enter info to create an account</CardDescription></CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="grid gap-4">

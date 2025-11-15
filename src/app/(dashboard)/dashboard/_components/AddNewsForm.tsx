@@ -67,7 +67,7 @@ export function AddNewsForm() {
 
   return (
     //  Make the Card a flex container
-    <Card className="flex flex-col">
+    <Card className="flex flex-col p-5 rounded-md">
       <CardHeader>
         <CardTitle>Create New Article</CardTitle>
       </CardHeader>

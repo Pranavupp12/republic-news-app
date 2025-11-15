@@ -36,7 +36,7 @@ export function AddSlideForm({ storyId, storyTitle }: AddSlideFormProps) {
     };
     
     return (
-        <Card>
+        <Card className='rounded-md p-5'>
             <CardHeader><CardTitle>Add New Slide to &quot;{storyTitle}&quot;</CardTitle></CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">

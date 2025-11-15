@@ -36,7 +36,7 @@ export default function LoginPage() {
     }
   };
   return (
-    <Card className="mx-auto w-full max-w-md">
+    <Card className="mx-auto w-full max-w-md p-4 rounded-xl">
       <CardHeader><CardTitle className="text-2xl">Login</CardTitle><CardDescription>Enter email to login</CardDescription></CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="grid gap-4">
