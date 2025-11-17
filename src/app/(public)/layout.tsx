@@ -32,9 +32,9 @@ export default function PublicLayout({
             <MobileNav /> {/* <-- ADD THE MOBILE NAV */}
             <HeaderInfo /> {/* This is already md:flex (hidden on mobile) */}
           </div>
-          <div className="text-center">
-            <Link href="/" className="text-md lg:text-3xl font-extrabold tracking-tight">
-              <span className="text-red-500">Republic</span> News
+          <div className="text-center -translate-x-5 sm:translate-x-5 ">
+            <Link href="/" className="text-2xl md:text-3xl font-bold tracking-tight whitespace-nowrap">
+              <span className="text-red-500">Republic </span>News
             </Link>
           </div>
           <div className="flex justify-end">
