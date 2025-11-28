@@ -75,7 +75,7 @@ export function SearchBar() {
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput 
-          placeholder="Type to search for titles or categories..."
+          placeholder="search for news articles"
           value={query}
           onValueChange={setQuery}
         />

@@ -1,7 +1,8 @@
 import Link from "next/link";
+import Image from "next/image";
 import { HeaderNav } from "./_components/HeaderNav";
 import { HeaderInfo } from "./_components/HeaderInfo";
-import { SearchBar } from "./_components/SearchBar"; 
+import { SearchBar } from "./_components/SearchBar";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input"; // <-- Import Input
 import { Button } from "@/components/ui/button";
@@ -32,9 +33,21 @@ export default function PublicLayout({
             <MobileNav /> {/* <-- ADD THE MOBILE NAV */}
             <HeaderInfo /> {/* This is already md:flex (hidden on mobile) */}
           </div>
-          <div className="text-center -translate-x-5 sm:translate-x-5 ">
-            <Link href="/" className="text-2xl md:text-3xl font-bold tracking-tight whitespace-nowrap">
-              <span className="text-red-500">Republic </span>News
+          <div className="flex justify-center items-center w-full">
+            <Link 
+              href="/" 
+              className="flex items-center gap-2 text-xl md:text-3xl font-extrabold tracking-tight whitespace-nowrap"
+            >
+              {/* LOGO IMAGE */}
+              <Image 
+                src="/logo/rn-logo.png"  // <--- REPLACE 'logo.png' WITH YOUR ACTUAL FILENAME
+                alt="Republic News Logo" 
+                width={200}
+                height={200}
+                loading="eager"
+                className="w-100 h-10 object-contain" // Responsive size
+              />
+              {/*<span><span className="text-red-500">Republic</span> News</span>*/}
             </Link>
           </div>
           <div className="flex justify-end">
@@ -57,15 +70,15 @@ export default function PublicLayout({
 
       <main className="flex-grow ">{children}</main>
 
-        <footer className="bg-neutral-900 text-neutral-300">
+      <footer className="bg-neutral-900 text-neutral-300">
         {/* CHANGE: Switched from lg:grid-cols-3 to lg:grid-cols-2 */}
         <div className="container mx-auto px-4 py-12 grid grid-cols-2 lg:grid-cols-2 gap-7 md:gap-0 ">
-          
+
           {/* Column 1: About & Social (Takes 1/2) */}
           <div className="lg:col-span-1 space-y-4">
-            <h3 className=" text-xl md:text-2xl font-bold font-heading text-white"><span className="text-red-500">Republic </span>News</h3>
+            <h3 className=" text-xl md:text-2xl font-regular font-heading text-white"><span className="text-red-500">Republic </span>News</h3>
             <p className=" text-xs md:text-sm text-neutral-400">
-              Your daily source for the most important headlines and in-depth<br className="hidden md:block"/> 
+              Your daily source for the most important headlines and in-depth<br className="hidden md:block" />
               stories from technology and business to culture and sports.
             </p>
             <div className="flex space-x-4 pt-2">
@@ -80,7 +93,7 @@ export default function PublicLayout({
           <div className="lg:col-span-1">
             {/* This is the NESTED 3-column grid */}
             <div className="grid grid-cols-2 md:grid-cols-3">
-              
+
               {/* Sub-Column 2a: Categories */}
               <div className="space-y-4">
                 <h3 className=" text-xs md:text-sm font-semibold uppercase text-red-500">Categories</h3>
@@ -113,10 +126,10 @@ export default function PublicLayout({
                   Get the latest headlines and updates delivered straight to your inbox.
                 </p>
                 <form className="flex w-full max-w-sm items-center">
-                  <Input 
-                    type="email" 
-                    placeholder="Email" 
-                    className="bg-neutral-800 border-neutral-700 text-white" 
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    className="bg-neutral-800 border-neutral-700 text-white"
                   />
                   <Button type="submit" variant="default" className="hover:text-red-500">
                     Submit
@@ -133,8 +146,10 @@ export default function PublicLayout({
           <div className="container mx-auto text-center text-xs text-neutral-500">
             <p>© {new Date().getFullYear()} Republic News. All rights reserved.</p>
             <p className="mt-2">
-              The material on this site may not be reproduced, distributed, transmitted, cached or
-              otherwise used, except with the prior written permission of Republic News.
+              Disclaimer: Our website provides accurate and clear news. While we have Professional duties to keep
+              our content accurate and helpful, we cannot guarantee that all information is always complete or up to
+              date. We are not legally responsible for any issues, losses, or decisions that result from using the
+              information on our site.
             </p>
           </div>
         </div>
