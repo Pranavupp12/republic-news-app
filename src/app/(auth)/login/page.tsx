@@ -60,7 +60,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" required placeholder="m@example.com" />
+              <Input id="email" name="email" type="email" required placeholder="team@republicnews.us" />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
