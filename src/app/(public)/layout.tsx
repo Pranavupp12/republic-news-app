@@ -2,12 +2,26 @@ import Link from "next/link";
 import Image from "next/image";
 import { HeaderNav } from "./_components/HeaderNav";
 import { HeaderInfo } from "./_components/HeaderInfo";
-import { SearchBar } from "./_components/SearchBar";
 import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input"; // <-- Import Input
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
-import { MobileNav } from "./_components/MobileNav";
+
+// --- OPTIMIZATION START ---
+import dynamic from 'next/dynamic';
+
+// Lazy load the MobileNav. 
+// We use ssr: true (default) so it's still in the HTML for SEO, 
+// but the JavaScript bundle is split separate from the main thread.
+const MobileNav = dynamic(() => 
+  import("./_components/MobileNav").then((mod) => mod.MobileNav)
+);
+
+// Lazy load SearchBar as well if it has complex logic (hooks, state)
+const SearchBar = dynamic(() => 
+  import("./_components/SearchBar").then((mod) => mod.SearchBar)
+);
+// --- OPTIMIZATION END ---
 
 const categories = [
   { name: 'Technology', href: '/category/Technology' },
@@ -26,40 +40,36 @@ export default function PublicLayout({
   return (
     <div className="flex flex-col min-h-screen">
       <header className="bg-background sticky top-0 z-50 border-b border-border/40">
-        {/* TOP TIER HEADER */}
         <div className="container mx-auto px-4 grid grid-cols-3 items-center h-14">
-          {/* Left Side: Show MobileNav on small, HeaderInfo on medium+ */}
+          
           <div className="flex justify-start">
-            <MobileNav /> {/* <-- ADD THE MOBILE NAV */}
-            <HeaderInfo /> {/* This is already md:flex (hidden on mobile) */}
+            {/* The MobileNav code will now be in a separate chunk */}
+            <MobileNav /> 
+            <HeaderInfo /> 
           </div>
+
           <div className="flex justify-center items-center w-full">
-            <Link 
-              href="/" 
-              className="flex items-center"
-            >
-              {/* LOGO IMAGE */}
+            <Link href="/" className="flex items-center">
               <Image 
-                src="/logo/rn-logo.png"  // <--- REPLACE 'logo.png' WITH YOUR ACTUAL FILENAME
+                src="/logo/rn-logo.png"
                 alt="Republic News Logo" 
                 width={222}
                 height={39}
                 priority={true}
-                className="object-contain" // Responsive size
+                className="object-contain"
               />
             </Link>
           </div>
+
           <div className="flex justify-end">
             <SearchBar />
           </div>
         </div>
 
-        {/* SEPARATOR LINE */}
         <div className="container mx-auto">
           <Separator />
         </div>
 
-        {/* BOTTOM TIER HEADER (Navigation) */}
         <div className="hidden md:block">
           <div className=" container mx-auto px-4 flex items-center justify-center h-12">
             <HeaderNav />
@@ -70,10 +80,7 @@ export default function PublicLayout({
       <main className="flex-grow ">{children}</main>
 
       <footer className="bg-neutral-900 text-neutral-300">
-        {/* CHANGE: Switched from lg:grid-cols-3 to lg:grid-cols-2 */}
         <div className="container mx-auto px-4 py-12 grid grid-cols-2 lg:grid-cols-2 gap-7 md:gap-0 ">
-
-          {/* Column 1: About & Social (Takes 1/2) */}
           <div className="lg:col-span-1 space-y-4">
             <h3 className=" text-xl md:text-2xl font-regular font-heading text-white"><span className="text-red-500">Republic </span>News</h3>
             <p className=" text-xs md:text-sm text-neutral-400">
@@ -88,12 +95,8 @@ export default function PublicLayout({
             </div>
           </div>
 
-          {/* Column 2: Links & Newsletter (Takes 1/2) */}
           <div className="lg:col-span-1">
-            {/* This is the NESTED 3-column grid */}
             <div className="grid grid-cols-2 md:grid-cols-3">
-
-              {/* Sub-Column 2a: Categories */}
               <div className="space-y-4">
                 <h3 className=" text-xs md:text-sm font-semibold uppercase text-red-500">Categories</h3>
                 <ul className="space-y-2">
@@ -107,18 +110,15 @@ export default function PublicLayout({
                 </ul>
               </div>
 
-              {/* Sub-Column 2b: Policy */}
               <div className="space-y-4">
                 <h3 className="text-xs md:text-sm font-semibold uppercase text-red-500">Policy</h3>
                 <ul className="space-y-2">
                   <li><Link href="/public-sitemap" className="text-xs md:text-sm hover:text-red-500 transition-colors">Sitemap</Link></li>
-                  {/*<li><Link href="/rss.xml" className="text-xs md:text-sm  hover:text-white transition-colors">RSS Feed</Link></li>*/}
                   <li><Link href="/terms-and-conditions" className="text-xs md:text-sm  hover:text-red-500 transition-colors">Terms & Conditions</Link></li>
                   <li><Link href="/privacy-policy" className="text-xs md:text-sm  hover:text-red-500 transition-colors">Privacy Policy</Link></li>
                 </ul>
               </div>
 
-              {/* Sub-Column 2c: Newsletter */}
               <div className="space-y-4 hidden md:block">
                 <h3 className="text-sm font-semibold uppercase text-red-500">Subscribe to our Newsletter</h3>
                 <p className="text-sm text-neutral-400">
@@ -140,7 +140,6 @@ export default function PublicLayout({
           </div>
         </div>
 
-        {/* --- BOTTOM DISCLAIMER (Unchanged) --- */}
         <div className="bg-black py-6 px-4">
           <div className="container mx-auto text-center text-xs text-neutral-500">
             <p>© {new Date().getFullYear()} Republic News. All rights reserved.</p>
