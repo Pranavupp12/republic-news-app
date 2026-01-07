@@ -7,9 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { SearchBar } from "./_components/SearchBar"; 
+import { MobileNav } from "./_components/MobileNav";
 
-// --- FIX: Import the new wrapper component instead of using dynamic() here ---
-import DynamicMobileNav from "./_components/DynamicMobileNav"; 
 
 const categories = [
   { name: 'Technology', href: '/category/Technology' },
@@ -32,7 +31,7 @@ export default function PublicLayout({
           
           <div className="flex justify-start">
             {/* Use the new wrapper component here */}
-            <DynamicMobileNav /> 
+            <MobileNav /> 
             <HeaderInfo /> 
           </div>
 
