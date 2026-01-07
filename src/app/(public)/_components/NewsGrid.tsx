@@ -26,8 +26,8 @@ export function NewsGrid({ initialArticles, columns = 3 }: NewsGridProps) {
   return (
     <div className={gridClass}>
       {/* 3. Replaced the duplicated card code with the ArticleCard component */}
-      {initialArticles.map((article) => (
-        <ArticleCard key={article.id} article={article} />
+      {initialArticles.map((article, index) => (
+        <ArticleCard key={article.id} article={article} priority={index < 3} />
       ))}
     </div>
   );

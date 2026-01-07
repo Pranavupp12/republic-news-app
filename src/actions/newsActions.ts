@@ -23,6 +23,7 @@ async function uploadImageToCloudinary(file: File) {
 
     const result = await cloudinary.uploader.upload(fileUri, {
         folder: 'news-portal',
+        format: 'webp',
         fetch_format: 'auto',
         quality: 'auto',
     });

@@ -1,12 +1,11 @@
-'use client'; // <-- 1. Add 'use client' directive
+'use client'; 
 
 import type { Article, User } from '@prisma/client';
 import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { format } from 'date-fns-tz';
-import { useState, useEffect } from 'react'; // <-- 2. Import hooks
+import { useState, useEffect } from 'react';
 
 type ArticleWithAuthor = Article & {
   author: User | null;
@@ -14,24 +13,27 @@ type ArticleWithAuthor = Article & {
 
 interface FeaturedArticleCardProps {
   article: ArticleWithAuthor;
+  priority?: boolean; // OPTIMIZATION: Add priority prop
 }
 
-export function FeaturedArticleCard({ article }: FeaturedArticleCardProps) {
-  // 3. Add state for the formatted date
-  const [formattedDate, setFormattedDate] = useState('');
+export function FeaturedArticleCard({ article, priority = false }: FeaturedArticleCardProps) {
+  const [formattedTime, setFormattedTime] = useState('');
 
-  // 4. Use useEffect to format date only on the client-side
   useEffect(() => {
-    // This code only runs in the browser, after hydration
-    setFormattedDate(
-      format(new Date(article.createdAt), 'h:mm a', { 
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone 
+    // OPTIMIZATION: Use native browser API instead of 'date-fns-tz' library
+    // This saves bundle size while keeping the "User Timezone" logic intact.
+    const date = new Date(article.createdAt);
+    setFormattedTime(
+      date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
       })
     );
-  }, [article.createdAt]); // Re-run if the article prop changes
+  }, [article.createdAt]);
 
   return (
-    <Card className="flex flex-col md:flex-row overflow-hidden  transition-shadow duration-300">
+    <Card className="flex flex-col md:flex-row overflow-hidden transition-shadow duration-300">
 
        {/* Right Side: Image */}
       <div className="relative w-full h-48 md:h-auto md:w-1/2 min-h-[200px] md:min-h-0 p-3 md:order-last">
@@ -42,7 +44,7 @@ export function FeaturedArticleCard({ article }: FeaturedArticleCardProps) {
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover rounded-md"
-            priority
+            priority={priority} // OPTIMIZATION: Only prioritize if passed true
           />
         </Link>
         <Badge
@@ -64,10 +66,9 @@ export function FeaturedArticleCard({ article }: FeaturedArticleCardProps) {
           {article.metaDescription}
         </p>
       
-        <div className="text-xs text-red-500 mt-auto"> {/* Changed red-500 back to muted-foreground */}
+        <div className="text-xs text-muted-foreground mt-auto">
           <span>
-            {/* 5. Display the state variable */}
-            Published at {formattedDate || '...'}
+            Published at {formattedTime || '...'}
           </span>
         </div>
       </CardContent>

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | Dash News',
+  title: 'Privacy Policy',
   description: 'Our privacy policy details how we handle your data.',
 };
 

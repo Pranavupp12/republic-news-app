@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Terms & Conditions | Dash News',
-  description: 'The terms and conditions for using Dash News.',
+  title: 'Terms & Conditions ',
+  description: 'The terms and conditions for using Republic News.',
 };
 
 export default function TermsAndConditionsPage() {

@@ -3,8 +3,8 @@ import Link from "next/link";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sitemap | Dash News",
-  description: "An overview of all sections, categories, and pages on Dash News.",
+  title: "Sitemap",
+  description: "An overview of all sections, categories, and pages on Republic News.",
 };
 
 export default async function SitemapPage() {

@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image'; 
 
 export function HeaderInfo() {
   const [date, setDate] = useState('');
-  const [location, setLocation] = useState('New Delhi'); // Default location
+  const [location, setLocation] = useState('United States'); // Default location
   const [temperature, setTemperature] = useState<number | null>(null);
+  
+  // We can keep the state logic in case you want it back later, 
+  // but it won't be displayed.
   const [weatherIcon, setWeatherIcon] = useState<string | null>(null); 
 
   useEffect(() => {
@@ -38,7 +40,7 @@ export function HeaderInfo() {
         if (data.main && data.name) {
           setTemperature(Math.round(data.main.temp));
           setLocation(data.name);
-          //grabbing icon from api response
+          
           if (data.weather && data.weather[0]) {
             console.log("Weather icon code received:", data.weather[0].icon);
             setWeatherIcon(data.weather[0].icon);
@@ -56,9 +58,7 @@ export function HeaderInfo() {
           fetchWeather(position.coords.latitude, position.coords.longitude);
         },
         () => {
-          // If user denies location, you could fall back to a default or do nothing.
           console.log("Geolocation permission denied. Using default location.");
-          // Optionally fetch weather for the default location
         }
       );
     }
@@ -70,16 +70,6 @@ export function HeaderInfo() {
       <span className="mx-2">|</span>
       <div className="flex items-center">
         <span>{location} {temperature !== null ? `${temperature}°C` : ''}</span>
-        {/* If we have an icon, display it */}
-        {weatherIcon && (
-          <Image
-            src={`https://openweathermap.org/img/wn/${weatherIcon}.png`}
-            alt="Weather icon"
-            width={28}
-            height={28}
-            className="mr-1"
-          />
-        )}
       </div>
     </div>
   );

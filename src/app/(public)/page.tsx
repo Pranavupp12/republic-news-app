@@ -1,4 +1,3 @@
-
 import { prisma } from "@/lib/prisma";
 import { NewsGrid } from "./_components/NewsGrid";
 import { PaginationControls } from "@/components/ui/PaginationControls";
@@ -10,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { Metadata } from 'next';
 import { format } from 'date-fns-tz';
+import { unstable_cache } from "next/cache"; // <-- IMPORT THIS
 
 export const metadata: Metadata = {
   title: "Republic News - Latest US News & Breaking Headlines",
@@ -17,12 +17,54 @@ export const metadata: Metadata = {
   keywords: ['us news', 'american news', 'breaking news', 'headlines', 'usa news', 'politics', 'business'],
 };
 
-
 const FEATURED_ARTICLES_COUNT = 7;
 const ARTICLES_PER_PAGE = 6;
 
+// --- 1. CACHED QUERY FOR TODAY'S ARTICLES ---
+const getCachedTodaysArticles = unstable_cache(
+  async (today: Date) => {
+    return await prisma.article.findMany({
+      where: { createdAt: { gte: today } },
+      orderBy: { createdAt: 'desc' },
+      include: { author: true },
+    });
+  },
+  ['todays-articles'], 
+  { revalidate: 60 } // Revalidate every 60 seconds
+);
+
+// --- 2. CACHED QUERY FOR FEATURED OLDER ARTICLES ---
+const getCachedFeaturedOlderArticles = unstable_cache(
+  async (today: Date) => {
+    return await prisma.article.findMany({
+      take: FEATURED_ARTICLES_COUNT,
+      where: {
+        isFeatured: true,
+        createdAt: { lt: today }
+      },
+      orderBy: { createdAt: 'desc' },
+      include: { author: true },
+    });
+  },
+  ['featured-older-articles'],
+  { revalidate: 60 }
+);
+
+// --- 3. CACHED QUERY FOR TRENDING ARTICLES ---
+const getCachedTrendingArticles = unstable_cache(
+  async () => {
+    return await prisma.article.findMany({
+      where: { isTrending: true },
+      take: 7,
+      orderBy: { updatedAt: 'desc' },
+    });
+  },
+  ['trending-articles'],
+  { revalidate: 60 }
+);
+
 interface HomePageProps {
-  searchParams: { page?: string };
+  searchParams: Promise<{ page?: string }>; // Updated for Next.js 15+ await rules
 }
 
 export default async function HomePage(props: HomePageProps) {
@@ -32,22 +74,19 @@ export default async function HomePage(props: HomePageProps) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const todaysArticles = await prisma.article.findMany({
-    where: { createdAt: { gte: today } },
-    orderBy: { createdAt: 'desc' },
-    include: { author: true },
-  });
+  // --- USE THE CACHED FUNCTIONS ---
+  // We run them in parallel for even more speed
+  const [todaysArticles, featuredOlderArticles, trendingArticles] = await Promise.all([
+    getCachedTodaysArticles(today),
+    getCachedFeaturedOlderArticles(today),
+    getCachedTrendingArticles(),
+  ]);
 
-  const featuredOlderArticles = await prisma.article.findMany({
-    take: FEATURED_ARTICLES_COUNT,
-    where: {
-      isFeatured: true,
-      createdAt: { lt: today }
-    },
-    orderBy: { createdAt: 'desc' },
-    include: { author: true },
-  });
-
+  // Note: Pagination queries usually shouldn't be heavily cached if they change often, 
+  // but since this is "older news", we keep it direct or could cache it too. 
+  // For now, let's keep the paginated list direct to ensure accuracy on page changes,
+  // as it is less critical for the "Above the Fold" LCP speed.
+  
   const totalPaginatedArticles = await prisma.article.count({
     where: {
       isFeatured: { not: true },
@@ -68,19 +107,13 @@ export default async function HomePage(props: HomePageProps) {
     include: { author: true },
   });
 
-  const trendingArticles = await prisma.article.findMany({
-    where: { isTrending: true },
-    take: 7,
-    orderBy: { updatedAt: 'desc' },
-  });
-
   return (
     <main className="container mx-auto py-10 px-10 md:px-4">
       {/* --- TOP SECTION --- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* --- SWAPPED: LEFT COLUMN IS NOW FEATURED & TRENDING --- */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 order-2 lg:order-1">
           <Card>
             <CardContent className="px-4 pt-3 pb-4">
               <h2 className="text-2xl text-red-500 font-bold font-heading mb-2">Featured</h2>
@@ -132,14 +165,14 @@ export default async function HomePage(props: HomePageProps) {
         </div>
 
         {/* --- SWAPPED: RIGHT COLUMN IS NOW TODAY'S HEADLINES --- */}
-        <div className="lg:col-span-2 ">
+        <div className="lg:col-span-2 order-1 lg:order-2">
           <Card>
             <CardContent className="pt-5 pb-5">
               <h2 className="text-2xl font-bold font-heading mb-2 text-center"><span className="text-red-500">Today&apos;s</span> Headlines</h2>
               {todaysArticles.length > 0 ? (
                 <div className="space-y-8 max-h-[740px] overflow-y-auto hide-scrollbar">
-                  {todaysArticles.map((article) => (
-                    <FeaturedArticleCard key={article.id} article={article} />
+                  {todaysArticles.map((article,index) => (
+                    <FeaturedArticleCard key={article.id} article={article} priority={index < 2} />
                   ))}
                 </div>
               ) : (

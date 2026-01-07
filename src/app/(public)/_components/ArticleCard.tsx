@@ -1,4 +1,4 @@
-// src/components/ArticleCard.tsx (or similar path)
+// src/components/ArticleCard.tsx
 'use client'; 
 
 import type { Article, User } from '@prisma/client';
@@ -6,34 +6,39 @@ import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { format } from 'date-fns-tz';
-import { useState, useEffect } from 'react'; // <-- 1. Import hooks
+import { useState, useEffect } from 'react';
 
-// Define the expected prop type
 type ArticleWithAuthor = Article & {
   author: User | null;
 };
 
 interface ArticleCardProps {
   article: ArticleWithAuthor;
+  // OPTIMIZATION 1: Accept a priority prop to control lazy loading
+  priority?: boolean;
 }
 
-export function ArticleCard({ article }: ArticleCardProps) {
-  // 2. Add state for the formatted date
+export function ArticleCard({ article, priority = false }: ArticleCardProps) {
   const [formattedDate, setFormattedDate] = useState('');
 
-  // 3. Use useEffect to format date only on the client-side
   useEffect(() => {
-    // This code only runs in the browser, after hydration
+    // OPTIMIZATION 2: Use native browser API instead of importing date-fns
+    // This removes the need to bundle a library for client-side formatting
+    const date = new Date(article.createdAt);
     setFormattedDate(
-      format(new Date(article.createdAt), 'MMM d, yyyy, h:mm a', { 
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone 
+      date.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
       })
     );
-  }, [article.createdAt]); // Re-run if the article prop changes
+  }, [article.createdAt]);
 
   return (
-    <Card key={article.id} className="flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <Card className="flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
       <CardHeader className="p-0 relative">
         <Link href={`/article/${article.slug}`} className="block relative h-48 w-full">
           <Image
@@ -42,7 +47,8 @@ export function ArticleCard({ article }: ArticleCardProps) {
             fill
             style={{ objectFit: "cover" }}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            priority
+            // OPTIMIZATION 1: Only prioritize if explicitly told to (e.g., top 2 items)
+            priority={priority}
           />
         </Link>
         <Badge variant="default" className="absolute top-3 right-3">{article.category}</Badge>
@@ -55,8 +61,6 @@ export function ArticleCard({ article }: ArticleCardProps) {
         <div className="text-sm text-red-500 mt-auto">
           <span>{article.author?.name || 'Anonymous'}</span>
           <span className="mx-2 text-muted-foreground">|</span>
-          {/* 4. Display the state variable. It will be empty on server-render
-               and update on client-mount, avoiding the mismatch. */}
           <span>{formattedDate || '...'}</span> 
         </div>
       </CardContent>

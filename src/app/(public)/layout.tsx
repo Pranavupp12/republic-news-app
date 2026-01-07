@@ -36,18 +36,17 @@ export default function PublicLayout({
           <div className="flex justify-center items-center w-full">
             <Link 
               href="/" 
-              className="flex items-center gap-2 text-xl md:text-3xl font-extrabold tracking-tight whitespace-nowrap"
+              className="flex items-center"
             >
               {/* LOGO IMAGE */}
               <Image 
                 src="/logo/rn-logo.png"  // <--- REPLACE 'logo.png' WITH YOUR ACTUAL FILENAME
                 alt="Republic News Logo" 
-                width={200}
-                height={200}
-                loading="eager"
-                className="w-100 h-10 object-contain" // Responsive size
+                width={222}
+                height={39}
+                priority={true}
+                className="object-contain" // Responsive size
               />
-              {/*<span><span className="text-red-500">Republic</span> News</span>*/}
             </Link>
           </div>
           <div className="flex justify-end">
