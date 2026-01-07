@@ -6,22 +6,10 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import { SearchBar } from "./_components/SearchBar"; 
 
-// --- OPTIMIZATION START ---
-import dynamic from 'next/dynamic';
-
-// Lazy load the MobileNav. 
-// We use ssr: true (default) so it's still in the HTML for SEO, 
-// but the JavaScript bundle is split separate from the main thread.
-const MobileNav = dynamic(() => 
-  import("./_components/MobileNav").then((mod) => mod.MobileNav)
-);
-
-// Lazy load SearchBar as well if it has complex logic (hooks, state)
-const SearchBar = dynamic(() => 
-  import("./_components/SearchBar").then((mod) => mod.SearchBar)
-);
-// --- OPTIMIZATION END ---
+// --- FIX: Import the new wrapper component instead of using dynamic() here ---
+import DynamicMobileNav from "./_components/DynamicMobileNav"; 
 
 const categories = [
   { name: 'Technology', href: '/category/Technology' },
@@ -43,8 +31,8 @@ export default function PublicLayout({
         <div className="container mx-auto px-4 grid grid-cols-3 items-center h-14">
           
           <div className="flex justify-start">
-            {/* The MobileNav code will now be in a separate chunk */}
-            <MobileNav /> 
+            {/* Use the new wrapper component here */}
+            <DynamicMobileNav /> 
             <HeaderInfo /> 
           </div>
 
@@ -65,7 +53,8 @@ export default function PublicLayout({
             <SearchBar />
           </div>
         </div>
-
+        
+        {/* ... Rest of the file remains exactly the same ... */}
         <div className="container mx-auto">
           <Separator />
         </div>
