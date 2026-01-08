@@ -116,7 +116,7 @@ export default async function HomePage(props: HomePageProps) {
         <div className="lg:col-span-1 order-2 lg:order-1">
           <Card>
             <CardContent className="px-4 pt-3 pb-4">
-              <h2 className="text-2xl text-red-500 font-bold font-heading mb-2">Featured</h2>
+              <h1 className="text-2xl text-red-500 font-bold font-heading mb-2">Featured</h1>
               <div className="space-y-4 max-h-[485px] overflow-y-auto hide-scrollbar pr-2">
                 {featuredOlderArticles.length > 0 ? (
                   featuredOlderArticles.map((article, index) => (
@@ -146,7 +146,7 @@ export default async function HomePage(props: HomePageProps) {
           
           <Card className="mt-8">
             <CardContent className="p-4 pt-3 pb-3">
-              <h2 className="text-2xl font-bold font-heading mb-2"><span className="text-red-500">Trending</span> Topics</h2>
+              <h1 className="text-2xl font-bold font-heading mb-2"><span className="text-red-500">Trending</span> Topics</h1>
               <div className="flex flex-wrap gap-2">
                 {trendingArticles.length > 0 ? (
                   trendingArticles.map((article) => (
@@ -168,7 +168,7 @@ export default async function HomePage(props: HomePageProps) {
         <div className="lg:col-span-2 order-1 lg:order-2">
           <Card>
             <CardContent className="pt-5 pb-5">
-              <h2 className="text-2xl font-bold font-heading mb-2 text-center"><span className="text-red-500">Today&apos;s</span> Headlines</h2>
+              <h1 className="text-2xl font-bold font-heading mb-2 text-center"><span className="text-red-500">Today&apos;s</span> Headlines</h1>
               {todaysArticles.length > 0 ? (
                 <div className="space-y-8 max-h-[740px] overflow-y-auto hide-scrollbar">
                   {todaysArticles.map((article,index) => (
@@ -192,7 +192,7 @@ export default async function HomePage(props: HomePageProps) {
       {paginatedOlderArticles.length > 0 && (
         <section id="more-news" className="mt-12">
           <Separator />
-          <h2 className="text-3xl font-bold font-heading my-8 text-center"><span className="text-red-500">Discover</span> More</h2>
+          <h1 className="text-3xl font-bold font-heading my-8 text-center"><span className="text-red-500">Discover</span> More</h1>
           <NewsGrid initialArticles={paginatedOlderArticles} columns={3} />
           {totalPages > 1 && (
             <div className="mt-12">

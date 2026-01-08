@@ -79,7 +79,6 @@ export async function createArticle(formData: FormData) {
         imageUrl,
         category,
         slug: slug, // NEW
-        // Use `|| null` to convert empty strings "" to null for the database
         metaTitle: metaTitle || null, // NEW
         metaDescription: metaDescription || null, // NEW
         metaKeywords: metaKeywords || null, // NEW

@@ -9,79 +9,197 @@ export default function PrivacyPolicyPage() {
   return (
     <main className="container mx-auto py-10 px-4 max-w-5xl">
       <h1 className="text-3xl md:text-4xl font-bold font-heading mb-2">Privacy Policy</h1>
-      <p className="text-sm text-muted-foreground mb-8">Last Updated: 24 Nov 2025</p>
+      <p className="text-sm text-muted-foreground mb-8">Last Updated: 24 November 2025</p>
 
       <div className="max-w-none space-y-8">
         
         <section>
-          <h2 className="text-xl font-bold mb-3">Introduction</h2>
           <p className="text-sm leading-relaxed">
-            Republic News, Inc. and our affiliates (collectively, “Republic News”, “we”, “our”, “us”) publish Republic News along with local media brands. Republic News respects your personal data and ensures a safe online experience for you. This privacy statement describes how we collect, use, and protect the data. You acknowledge that you have read and consent to be bound by the practices described in this privacy policy by using it. If you disagree with our policy, we respectfully ask that you stop using our website.
+            Republic News, Inc. (together with its affiliates, collectively referred to as “Republic News,” “we,” “our,” or “us”) operates the website https://www.republicnews.us (the “Website”). We are committed to protecting your privacy and ensuring transparency about how we collect, use, and safeguard your information.
+          </p>
+          <p className="text-sm leading-relaxed mt-4">
+            This Privacy Policy explains what information we collect, how we use it, your privacy rights, and how you can contact us with questions or requests. By accessing or using our Website, you agree to the practices described in this Privacy Policy. If you do not agree, please discontinue use of the Website.
           </p>
         </section>
 
         <section>
           <h2 className="text-xl font-bold mb-3">Information We Collect</h2>
-          <h3 className="text-lg font-semibold mb-2">Personal Information</h3>
+          
+          <h3 className="text-lg font-semibold mb-2">1. Personal Information</h3>
+          <p className="text-sm leading-relaxed mb-2">
+            We collect personal information that you voluntarily provide to us, including:
+          </p>
+          <ul className="list-disc pl-5 mb-4 text-sm space-y-1">
+            <li>Name</li>
+            <li>Email address</li>
+            <li>Phone number (if provided)</li>
+            <li>Information submitted through contact forms</li>
+            <li>Email address provided for newsletter subscriptions</li>
+          </ul>
+          <p className="text-sm leading-relaxed mb-4">
+            You are not required to provide personal information to browse our Website; however, certain features may not be available without it.
+          </p>
+
+          <h3 className="text-lg font-semibold mb-2">2. Non-Personal Information</h3>
+          <p className="text-sm leading-relaxed mb-2">
+            When you visit Republic News, we may automatically collect certain non-personal information, such as:
+          </p>
+          <ul className="list-disc pl-5 mb-4 text-sm space-y-1">
+            <li>IP address</li>
+            <li>Browser type and version</li>
+            <li>Device type</li>
+            <li>Pages visited and time spent on pages</li>
+            <li>Referring URLs</li>
+            <li>Date and time of access</li>
+          </ul>
           <p className="text-sm leading-relaxed">
-            We collect the data that you provide to us. The types of data you mainly provided are your name, email address, phone number, and information provided through the contact form and newsletter sign-up.
+            This information is used for website analytics, security, and performance optimization.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold mb-3">Cookies and Tracking Technologies</h2>
+          <p className="text-sm leading-relaxed mb-2">
+            Republic News uses cookies and similar tracking technologies to enhance user experience and analyze website traffic. Cookies may be used to:
+          </p>
+          <ul className="list-disc pl-5 mb-4 text-sm space-y-1">
+            <li>Remember user preferences</li>
+            <li>Understand how visitors interact with our Website</li>
+            <li>Improve content, layout, and performance</li>
+          </ul>
+          <p className="text-sm leading-relaxed">
+            You can choose to disable cookies through your browser settings. Please note that disabling cookies may affect certain features of the Website.
           </p>
         </section>
 
         <section>
           <h2 className="text-xl font-bold mb-3">How We Use Your Information</h2>
-          <p className="text-sm leading-relaxed">
-            We collect and use the information you provide to deliver a personalized and enhanced experience on our website. This may include sending you updates, newsletters, promotional materials, and other communications related to our products, services, or industry news. We may also use your information to inform you about important changes, offers, or events that may be relevant to you. Your information will be handled with care and used solely for the purposes outlined, in accordance with applicable data protection laws. We do not sell or share your personal information with third parties for their marketing purposes without your consent.
+          <p className="text-sm leading-relaxed mb-2">
+            We use the information we collect for the following purposes:
+          </p>
+          <ul className="list-disc pl-5 mb-4 text-sm space-y-1">
+            <li>To operate and maintain the Website</li>
+            <li>To deliver news content and updates</li>
+            <li>To respond to inquiries and support requests</li>
+            <li>To send newsletters and email updates (only if you subscribe)</li>
+            <li>To analyze traffic and user behavior</li>
+            <li>To improve our services, content quality, and user experience</li>
+            <li>To comply with legal obligations</li>
+          </ul>
+          <p className="text-sm leading-relaxed font-semibold">
+            We do not sell your personal information.
           </p>
         </section>
 
         <section>
-          <h2 className="text-xl font-bold mb-3">Your Rights</h2>
+          <h2 className="text-xl font-bold mb-3">Third-Party Services</h2>
+          <p className="text-sm leading-relaxed mb-2">
+            Republic News may use third-party services such as:
+          </p>
+          <ul className="list-disc pl-5 mb-4 text-sm space-y-1">
+            <li>Analytics providers (e.g., Google Analytics)</li>
+            <li>Advertising partners</li>
+            <li>Email service providers</li>
+            <li>Hosting and security services</li>
+          </ul>
           <p className="text-sm leading-relaxed">
-            Republic News is an informative website. That’s why we collect only some data, which is read to you in our “Information We Collect” section. Because of this, we do not claim any additional rights over your personal information.
+            These third parties may collect information in accordance with their own privacy policies. Republic News does not control how third parties collect or use data and encourages users to review their respective privacy policies.
           </p>
         </section>
 
         <section>
-          <h2 className="text-xl font-bold mb-3">Email & Newsletter</h2>
-          <p className="text-sm leading-relaxed mb-4">
-            Stay connected with the latest updates from Republicnews. By subscribing to our email list, you will receive our news updates in your inbox. If you don’t want to miss any important news updates, make sure to subscribe to our blog.
-          </p>
+          <h2 className="text-xl font-bold mb-3">Advertising and Google AdSense</h2>
           <p className="text-sm leading-relaxed">
-            We share the latest stories, quick updates, and important information straight to your inbox. Click Subscribe and stay informed every day!
+            Republic News may display advertisements from third-party ad networks, including Google AdSense. These advertisers may use cookies, JavaScript, or web beacons to serve ads based on users’ visits to this and other websites. Users may opt out of personalized advertising by visiting Google’s Ads Settings or through industry opt-out mechanisms.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold mb-3">Email Communications and Newsletters</h2>
+          <p className="text-sm leading-relaxed">
+            If you subscribe to our newsletter, we may send you emails containing news updates, alerts, and relevant information. You may unsubscribe at any time by clicking the “unsubscribe” link included in our emails or by contacting us directly. We do not send unsolicited marketing emails.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold mb-3">Data Retention</h2>
+          <p className="text-sm leading-relaxed">
+            We retain personal information only for as long as necessary to fulfill the purposes outlined in this Privacy Policy, unless a longer retention period is required or permitted by law. When personal data is no longer needed, it is securely deleted or anonymized.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold mb-3">Data Security</h2>
+          <p className="text-sm leading-relaxed">
+            We implement reasonable administrative, technical, and physical safeguards to protect your personal information. However, no method of transmission over the Internet or electronic storage is 100% secure, and we cannot guarantee absolute security.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold mb-3">Your Privacy Rights</h2>
+          <p className="text-sm leading-relaxed mb-2">
+            Depending on your location, you may have certain rights regarding your personal information, including:
+          </p>
+          <ul className="list-disc pl-5 mb-4 text-sm space-y-1">
+            <li>The right to access the personal data we hold about you</li>
+            <li>The right to request correction or deletion of your data</li>
+            <li>The right to object to or restrict certain processing activities</li>
+          </ul>
+          <p className="text-sm leading-relaxed">
+            To exercise your rights, please contact us using the details provided below.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold mb-3">California Privacy Rights (CCPA/CPRA)</h2>
+          <p className="text-sm leading-relaxed mb-2">
+            If you are a California resident, you have the right to:
+          </p>
+          <ul className="list-disc pl-5 mb-4 text-sm space-y-1">
+            <li>Know what personal information we collect and how it is used</li>
+            <li>Request deletion of your personal information</li>
+            <li>Opt out of the sale or sharing of personal information (Republic News does not sell personal data)</li>
+            <li>Not be discriminated against for exercising your privacy rights</li>
+          </ul>
+          <p className="text-sm leading-relaxed">
+            Requests can be made by contacting us at support@republicnews.us.
           </p>
         </section>
 
         <section>
           <h2 className="text-xl font-bold mb-3">Children’s Privacy</h2>
           <p className="text-sm leading-relaxed">
-            We do not knowingly collect data from individuals under 13 years of age. If we discover that such information were collected, we would delete it.
+            Republic News does not knowingly collect personal information from children under the age of 13. If we become aware that such information has been collected, we will take steps to delete it promptly.
           </p>
         </section>
 
         <section>
-          <h2 className="text-xl font-bold mb-3">Overview</h2>
+          <h2 className="text-xl font-bold mb-3">External Links</h2>
           <p className="text-sm leading-relaxed">
-            This Privacy Policy explains what Personal Information we are collecting and processing, how and why we are processing it, and how you may request deletion of your Personal Information and exercise other rights you may have.
+            Our Website may contain links to external websites. Republic News is not responsible for the privacy practices or content of third-party websites. We encourage users to review the privacy policies of any external sites they visit.
           </p>
         </section>
 
         <section>
           <h2 className="text-xl font-bold mb-3">Changes to This Privacy Policy</h2>
           <p className="text-sm leading-relaxed">
-            We reserve the right to update this privacy policy at any time. By continuing to use our services, you accept the revised terms.
+            We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated revision date. Continued use of the Website after changes are posted constitutes acceptance of the revised policy.
           </p>
         </section>
 
         <section>
           <h2 className="text-xl font-bold mb-3">Contact Us</h2>
           <p className="text-sm leading-relaxed">
-            If you have questions, contact us at:
+            If you have any questions, concerns, or requests regarding this Privacy Policy, please contact us:
           </p>
           <ul className="list-none mt-2 text-sm space-y-1">
-            <li>📧 Email:support@republicnews.us</li>
+            <li>📧 Email: <a href="mailto:support@republicnews.us" className="text-red-500 hover:underline">support@republicnews.us</a></li>
           </ul>
         </section>
+
+        <p className="text-xs text-muted-foreground pt-4 border-t">
+          © 2026 Republic News. All rights reserved.
+        </p>
 
       </div>
     </main>

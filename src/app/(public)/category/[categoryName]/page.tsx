@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import { notFound } from "next/navigation";
 import { PaginationControls } from "@/components/ui/PaginationControls";
 import type { Metadata } from 'next';
 import { ArticleCard } from '../../_components/ArticleCard'; // Import the ArticleCard Client Component

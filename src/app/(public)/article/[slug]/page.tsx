@@ -27,6 +27,13 @@ export async function generateMetadata(props: ArticlePageProps): Promise<Metadat
     title: article.metaTitle || article.title,
     description: article.metaDescription || undefined,
     keywords: keywords,
+
+    // Canonical URL
+    alternates: {
+      // Explicitly set the clean URL for this article
+      canonical: `/article/${article.slug}`,
+    },
+
     // NEW: Add Open Graph for Facebook/LinkedIn/WhatsApp
     openGraph: {
       title: article.metaTitle || article.title,
