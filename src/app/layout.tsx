@@ -3,7 +3,6 @@ import { Inter, Calistoga } from "next/font/google"; // <-- 1. Import Heading Fo
 import "./globals.css";
 import AuthProvider from "./context/AuthProvider";
 import { Toaster } from "sonner";
-import Script from 'next/script';
 
 // --- OPTIMIZE FONTS ---
 const inter = Inter({
@@ -49,11 +48,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${inter.variable} ${calistoga.variable} font-sans antialiased`}>
         <AuthProvider>
           {children}
-          <Script
-            src="https://analytics.ahrefs.com/analytics.js"
-            data-key="jr+qzSezxs+S6zg7KtOZrQ"
-            strategy="afterInteractive"
-          />
           <Toaster />
         </AuthProvider>
       </body>

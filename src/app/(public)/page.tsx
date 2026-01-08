@@ -12,8 +12,8 @@ import { format } from 'date-fns-tz';
 import { unstable_cache } from "next/cache"; // <-- IMPORT THIS
 
 export const metadata: Metadata = {
-  title: "Republic News - Latest US News & Breaking Headlines",
-  description: "Get the latest breaking news from the United States, including politics, business, technology, and culture. Republic News is your trusted source for American headlines.",
+  title: "Latest US News & Breaking Headlines",
+  description: "Get the latest breaking news from the United States, including politics, business, technology, and culture.",
   keywords: ['us news', 'american news', 'breaking news', 'headlines', 'usa news', 'politics', 'business'],
 };
 
@@ -116,7 +116,7 @@ export default async function HomePage(props: HomePageProps) {
         <div className="lg:col-span-1 order-2 lg:order-1">
           <Card>
             <CardContent className="px-4 pt-3 pb-4">
-              <h1 className="text-2xl text-red-500 font-bold font-heading mb-2">Featured</h1>
+              <h2 className="text-2xl text-red-500 font-bold font-heading mb-2">Featured</h2>
               <div className="space-y-4 max-h-[485px] overflow-y-auto hide-scrollbar pr-2">
                 {featuredOlderArticles.length > 0 ? (
                   featuredOlderArticles.map((article, index) => (
@@ -146,7 +146,7 @@ export default async function HomePage(props: HomePageProps) {
           
           <Card className="mt-8">
             <CardContent className="p-4 pt-3 pb-3">
-              <h1 className="text-2xl font-bold font-heading mb-2"><span className="text-red-500">Trending</span> Topics</h1>
+              <h2 className="text-2xl font-bold font-heading mb-2"><span className="text-red-500">Trending</span> Topics</h2>
               <div className="flex flex-wrap gap-2">
                 {trendingArticles.length > 0 ? (
                   trendingArticles.map((article) => (
@@ -192,7 +192,7 @@ export default async function HomePage(props: HomePageProps) {
       {paginatedOlderArticles.length > 0 && (
         <section id="more-news" className="mt-12">
           <Separator />
-          <h1 className="text-3xl font-bold font-heading my-8 text-center"><span className="text-red-500">Discover</span> More</h1>
+          <h2 className="text-3xl font-bold font-heading my-8 text-center"><span className="text-red-500">Discover</span> More</h2>
           <NewsGrid initialArticles={paginatedOlderArticles} columns={3} />
           {totalPages > 1 && (
             <div className="mt-12">
