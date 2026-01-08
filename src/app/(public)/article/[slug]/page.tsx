@@ -22,7 +22,7 @@ export async function generateMetadata(props: ArticlePageProps): Promise<Metadat
 
   const keywords = article.metaKeywords ? article.metaKeywords.split(',').map(k => k.trim()) : [];
   const publishedTime = new Date(article.createdAt).toISOString();
-  
+
   return {
     title: article.metaTitle || article.title,
     description: article.metaDescription || undefined,
@@ -51,7 +51,7 @@ export async function generateMetadata(props: ArticlePageProps): Promise<Metadat
       locale: 'en_US',
       type: 'article',
       publishedTime: publishedTime,
-      authors: [article.authorId || 'Republic News'], 
+      authors: [article.authorId || 'Republic News'],
     },
     // NEW: Add Twitter Card
     twitter: {
@@ -77,20 +77,36 @@ export default async function ArticlePage(props: ArticlePageProps) {
   const dateString = format(new Date(article.createdAt), 'MMMM d, yyyy', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone });
   const isoDate = new Date(article.createdAt).toISOString();
 
+  const datePublished = new Date(article.createdAt).toISOString();
+  const dateModified = new Date(article.updatedAt).toISOString();
+
   // --- 2. STRUCTURED DATA (JSON-LD) ---
-  // This tells Google "This is a News Article" for rich snippets
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
     headline: article.metaTitle || article.title,
+    description: article.metaDescription || undefined, // Mapped to schema
     image: [article.imageUrl],
-    datePublished: isoDate,
-    dateModified: isoDate, // Ideally add an 'updatedAt' field to your model later
+    datePublished: datePublished,
+    dateModified: dateModified, // Critical for Google to know when you updated the story
     author: [{
       '@type': 'Person',
       name: article.author?.name || 'Republic News',
-      url: `https://republicnews.us/author/${article.authorId}` // Optional
+      url: `https://republicnews.us/author/${article.authorId}` // Optional: Create an author page later
     }],
+    publisher: {
+      '@type': 'Organization',
+      name: 'Republic News',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://republicnews.us/logo/rn-logo.png' // Ensure this path is correct
+      }
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `https://republicnews.us/article/${article.slug}`
+    }
   };
 
   return (
@@ -122,9 +138,8 @@ export default async function ArticlePage(props: ArticlePageProps) {
             src={article.imageUrl}
             alt={article.title}
             fill
-            // FIX: Since this image is max-w-4xl (approx 900px), tell the browser that!
-            // Before: 33vw (too small). Now: 100vw on mobile, 900px on desktop.
-            sizes="(max-width: 768px) 100vw, 900px" 
+            //100vw on mobile, 900px on desktop.
+            sizes="(max-width: 768px) 100vw, 900px"
             className="object-cover"
             priority // Keep this for LCP
           />

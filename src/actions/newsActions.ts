@@ -320,5 +320,27 @@ export async function toggleTrendingStatus(
   }
 }
 
+// NEW: Image Upload Action for Rich Text Editor
+export async function uploadEditorImage(formData: FormData) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated" };
+  }
 
+  try {
+    const file = formData.get('file') as File;
+    
+    if (!file || file.size === 0) {
+      return { success: false, error: "No file provided" };
+    }
 
+    // Reuse your existing internal helper function
+    const url = await uploadImageToCloudinary(file);
+    
+    return { success: true, url };
+
+  } catch (error) {
+    console.error('Editor upload error:', error);
+    return { success: false, error: "Upload failed" };
+  }
+}
