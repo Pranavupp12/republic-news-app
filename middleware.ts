@@ -41,7 +41,6 @@ export function middleware(request: NextRequest) {
 
 // 6. Matcher: Run on most paths, excluding static assets/API
 export const config = {
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$).*)',
-  ],
+  // We added "|.*\\.txt" to the exclusion list
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\.txt).*)'],
 };
