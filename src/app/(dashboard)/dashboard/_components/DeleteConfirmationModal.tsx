@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Import useEffect
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogClose, // Import DialogClose
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
 
@@ -21,14 +21,20 @@ interface DeleteConfirmationModalProps {
 export function DeleteConfirmationModal({ isOpen, onClose, onConfirm }: DeleteConfirmationModalProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // FIX: Reset the loading state whenever the modal is opened
+  useEffect(() => {
+    if (isOpen) {
+      setIsDeleting(false);
+    }
+  }, [isOpen]);
+
   const handleConfirmClick = async () => {
     setIsDeleting(true);
     await onConfirm();
-    // No need to set isDeleting to false here, as the component will unmount
+    setIsDeleting(false); // Optional safety reset
   };
 
   return (
-    // Use the standard Dialog component
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
@@ -39,9 +45,8 @@ export function DeleteConfirmationModal({ isOpen, onClose, onConfirm }: DeleteCo
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          {/* DialogClose will act as the "Cancel" button and also work with the 'X' icon */}
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" disabled={isDeleting}>Cancel</Button>
           </DialogClose>
           <Button
             onClick={handleConfirmClick}

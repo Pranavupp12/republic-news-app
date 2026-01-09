@@ -1,0 +1,12 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin and API paths to save crawl budget
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+
+# Point to your Sitemap (CRITICAL for SEO)
+Sitemap: https://www.republicnews.us/sitemap.xml

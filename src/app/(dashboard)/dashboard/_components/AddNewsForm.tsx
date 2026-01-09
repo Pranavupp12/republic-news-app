@@ -21,7 +21,6 @@ import { RichTextEditor } from './RichTextEditor';
 
 const categories = ['Technology', 'Travel', 'Sports', 'Business', 'Culture', 'News'];
 
-// Helper function to create a URL-friendly slug
 function slugify(text: string) {
   return text.toString().toLowerCase().trim()
     .replace(/\s+/g, '-')
@@ -32,14 +31,18 @@ function slugify(text: string) {
 export function AddNewsForm() {
   const [imageSource, setImageSource] = useState<'url' | 'upload'>('url');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Form States
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [content, setContent] = useState('');
+  // 1. ADD STATE FOR CATEGORY
+  const [category, setCategory] = useState(''); 
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
-    setSlug(slugify(newTitle)); // Auto-generate slug as user types
+    setSlug(slugify(newTitle)); 
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -48,16 +51,21 @@ export function AddNewsForm() {
     const form = event.currentTarget;
     const formData = new FormData(form);
 
-    formData.append('content', content);
+    // 2. MANUALLY APPEND THE CONTENT AND CATEGORY TO FORM DATA
+    formData.set('content', content); // .set replaces existing if any
+    formData.set('category', category); // This ensures the selected value is sent, not the default
 
     const result = await createArticle(formData);
 
     if (result.success) {
       toast.success("Success", { description: "Article created successfully." });
       form.reset();
+      
+      // 3. RESET ALL STATES
       setTitle('');
       setSlug('');
       setContent('');
+      setCategory(''); // Reset category
       setImageSource('url');
     } else {
       toast.error("Error", { description: result.error || "Failed to create article." });
@@ -66,14 +74,11 @@ export function AddNewsForm() {
   };
 
   return (
-    //  Make the Card a flex container
     <Card className="flex flex-col p-5 rounded-md">
       <CardHeader>
         <CardTitle>Create New Article</CardTitle>
       </CardHeader>
-      {/* CHANGE 2: Make CardContent grow and also be a flex container */}
       <CardContent className="flex-grow flex flex-col">
-        {/* CHANGE 3: Make the form grow and also be a flex container */}
         <form onSubmit={handleSubmit} className="flex flex-col flex-grow space-y-4">
           <div className="space-y-2">
             <Label htmlFor="title">Title</Label>
@@ -88,14 +93,20 @@ export function AddNewsForm() {
 
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
-            <Select name="category" required>
+            {/* 4. BIND VALUE AND ONVALUECHANGE TO STATE */}
+            <Select 
+              name="category" 
+              required 
+              value={category} 
+              onValueChange={setCategory}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
               <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
+                {categories.map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -115,7 +126,6 @@ export function AddNewsForm() {
             <div className="space-y-2"><Label htmlFor="imageFile">Upload Image</Label><Input id="imageFile" name="imageFile" type="file" accept="image/*" /></div>
           )}
 
-          {/* --- SEO FIELDS --- */}
           <div className="space-y-2">
             <Label htmlFor="metaTitle">Meta Title (SEO)</Label>
             <Input id="metaTitle" name="metaTitle" placeholder="Optional: SEO-friendly title" />
@@ -129,22 +139,15 @@ export function AddNewsForm() {
             <Input id="metaKeywords" name="metaKeywords" placeholder="Optional: comma, separated, keywords" />
           </div>
 
-          {/* CHANGE 4: Make the content section expand 
-          <div className="space-y-2 flex flex-col flex-grow">
-            <Label htmlFor="content">Content</Label>
-            <Textarea id="content" name="content" placeholder="Write your article content here..." required className="flex-grow" />
-          </div>*/}
-
           <div className="space-y-2 flex flex-col flex-grow">
             <Label>Content</Label>
             <RichTextEditor
               value={content}
               onChange={setContent}
-              onBlur={() => { }} // You can use this for form validation if needed
+              onBlur={() => { }} 
             />
           </div>
 
-          {/* This button will now be pushed to the bottom */}
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isSubmitting ? 'Publishing...' : 'Publish Article'}

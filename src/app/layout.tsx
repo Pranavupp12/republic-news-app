@@ -36,8 +36,15 @@ export const metadata: Metadata = {
   description: 'Your daily source for breaking news and headlines from the United States.',
   keywords: ['us news', 'american news', 'republic news', 'headlines', 'politics'],
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
