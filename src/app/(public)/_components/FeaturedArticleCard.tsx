@@ -13,15 +13,13 @@ type ArticleWithAuthor = Article & {
 
 interface FeaturedArticleCardProps {
   article: ArticleWithAuthor;
-  priority?: boolean; // OPTIMIZATION: Add priority prop
+  priority?: boolean;
 }
 
 export function FeaturedArticleCard({ article, priority = false }: FeaturedArticleCardProps) {
   const [formattedTime, setFormattedTime] = useState('');
 
   useEffect(() => {
-    // OPTIMIZATION: Use native browser API instead of 'date-fns-tz' library
-    // This saves bundle size while keeping the "User Timezone" logic intact.
     const date = new Date(article.createdAt);
     setFormattedTime(
       date.toLocaleTimeString('en-US', {
@@ -33,10 +31,11 @@ export function FeaturedArticleCard({ article, priority = false }: FeaturedArtic
   }, [article.createdAt]);
 
   return (
-    <Card className="flex flex-col md:flex-row overflow-hidden transition-shadow duration-300">
+    // Added 'h-full' to ensure the card takes available height
+    <Card className="flex flex-col md:flex-row overflow-hidden h-full">
 
        {/* Right Side: Image */}
-      <div className="relative w-full h-48 md:h-auto md:w-1/2 min-h-[200px] md:min-h-0 p-3 md:order-last">
+      <div className="relative w-full h-60 md:h-auto md:w-1/2 min-h-[200px] p-3 md:order-last">
         <Link href={`/article/${article.slug}`} className="block w-full h-full relative">
           <Image
             src={article.imageUrl || "https://placehold.co/600x400"}
@@ -44,7 +43,7 @@ export function FeaturedArticleCard({ article, priority = false }: FeaturedArtic
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover rounded-md"
-            priority={priority} // OPTIMIZATION: Only prioritize if passed true
+            priority={priority} 
           />
         </Link>
         <Badge
@@ -56,17 +55,23 @@ export function FeaturedArticleCard({ article, priority = false }: FeaturedArtic
       </div>
 
       {/* Left Side: Text Content */}
-      <CardContent className="flex flex-col p-3 w-full md:w-1/2">
+      {/* - Removed 'space-x-2' (this was causing the weird left indentation)
+          - Added 'justify-between': Pushes Title to top, Footer to bottom, Desc in middle
+          - Added 'gap-2': Ensures minimum spacing so elements don't touch
+      */}
+      <CardContent className="flex flex-col p-3 w-full md:w-1/2 gap-2">
         <h2 className="text-xl font-bold font-heading mb-2">
           <Link href={`/article/${article.slug}`} className="hover:text-primary transition-colors">
             {article.title}
           </Link>
         </h2>
-        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+        
+        <p className="text-sm text-muted-foreground line-clamp-4">
           {article.metaDescription}
         </p>
       
-        <div className="text-xs text-muted-foreground mt-auto">
+        {/* Removed 'mt-auto' because justify-between handles the spacing now */}
+        <div className="text-xs text-muted-foreground border-t pt-2 mt-2">
           <span>
             Published at {formattedTime || '...'}
           </span>
