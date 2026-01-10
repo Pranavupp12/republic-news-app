@@ -108,21 +108,21 @@ export default async function HomePage(props: HomePageProps) {
   });
 
   return (
-    <main className="container mx-auto py-10 px-10 md:px-4">
+    <main className="container mx-auto py-4 lg:py-10 px-4 lg:px-0">
       {/* --- TOP SECTION --- */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* --- SWAPPED: LEFT COLUMN IS NOW FEATURED & TRENDING --- */}
         <div className="lg:col-span-1 order-2 lg:order-1">
           <Card>
-            <CardContent className="px-4 pt-3 pb-4">
+            <CardContent className="px-4 pt-5 pb-5">
               <h2 className="text-2xl text-red-500 font-bold font-heading mb-2">Featured</h2>
               <div className="space-y-4 max-h-[485px] overflow-y-auto hide-scrollbar pr-2">
                 {featuredOlderArticles.length > 0 ? (
                   featuredOlderArticles.map((article, index) => (
                     <div key={article.id}>
                       <Link href={`/article/${article.slug}`} className="block group">
-                        <Badge variant="default" className="mb-1">{article.category}</Badge>
+                        <Badge variant="default" className="mb-1 text-xs sm:text-sm">{article.category}</Badge>
                         <h3 className="font-bold font-heading group-hover:text-primary transition-colors">{article.title}</h3>
 
                         <p className="text-xs text-red-500 mt-1">
@@ -144,8 +144,8 @@ export default async function HomePage(props: HomePageProps) {
             </CardContent>
           </Card>
           
-          <Card className="mt-8">
-            <CardContent className="p-4 pt-3 pb-3">
+          <Card className="mt-6">
+            <CardContent className="p-4 pt-5 pb-5">
               <h2 className="text-2xl font-bold font-heading mb-2"><span className="text-red-500">Trending</span> Topics</h2>
               <div className="flex flex-wrap gap-2">
                 {trendingArticles.length > 0 ? (
@@ -190,9 +190,9 @@ export default async function HomePage(props: HomePageProps) {
 
       {/* --- BOTTOM SECTION (Unchanged) --- */}
       {paginatedOlderArticles.length > 0 && (
-        <section id="more-news" className="mt-12">
+        <section id="more-news" className="mt-8 lg:mt-12">
           <Separator />
-          <h2 className="text-3xl font-bold font-heading my-8 text-center"><span className="text-red-500">Discover</span> More</h2>
+          <h2 className="text-3xl font-bold font-heading my-6 lg:my-8 text-center"><span className="text-red-500">Discover</span> More</h2>
           <NewsGrid initialArticles={paginatedOlderArticles} columns={3} />
           {totalPages > 1 && (
             <div className="mt-12">

@@ -1,8 +1,8 @@
-import { prisma } from "@/lib/prisma"; // Or your prisma client path
+import { prisma } from "@/lib/prisma";
 import RSS from "rss";
 
 // IMPORTANT: Replace this with your actual, live domain
-const YOUR_DOMAIN = "https://republicnews.us";
+const YOUR_DOMAIN = "https://www.republicnews.us";
 
 export async function GET() {
   const feed = new RSS({
@@ -16,11 +16,12 @@ export async function GET() {
 
   // Fetch your recent articles using Prisma
   const articles = await prisma.article.findMany({
+    take: 50, // OPTIMIZATION: Limit to recent 50 to keep feed light
     orderBy: {
       createdAt: 'desc',
     },
     include: {
-      author: true, // Include author data
+      author: true,
     },
   });
 
@@ -28,20 +29,17 @@ export async function GET() {
   articles.forEach((article) => {
     feed.item({
       title: article.title,
-      // Use metaDescription or a substring of content
       description: article.metaDescription || article.content.substring(0, 200),
       url: `${YOUR_DOMAIN}/article/${article.slug}`,
-      guid: article.id, // Prisma uses 'id', not '_id'
+      guid: article.id,
       date: article.createdAt,
       author: article.author?.name || "Republic News Team",
-      categories: [article.category],
+      categories: [article.category], // This automatically picks up your new categories
     });
   });
 
-  // Generate the XML string
   const xml = feed.xml({ indent: true });
 
-  // Return the response with the correct XML content type
   return new Response(xml, {
     headers: {
       'Content-Type': 'application/xml; charset=utf-8',

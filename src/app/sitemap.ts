@@ -1,8 +1,10 @@
 import { MetadataRoute } from 'next';
-import { prisma } from '@/lib/prisma'; // Or your prisma client path
+import { prisma } from '@/lib/prisma';
+// 1. IMPORT YOUR CONSTANT
+import { ARTICLE_CATEGORIES } from '@/lib/constants';
 
 // IMPORTANT: Replace this with your actual, live website domain
-const URL = "https://republicnews.us";
+const URL = "https://www.republicnews.us";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   
@@ -22,9 +24,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // 2. Get Category Pages (using your known categories)
-  const categories = ['Technology', 'Travel', 'Sports', 'Business', 'Culture', 'News'];
-  const categoryPages: MetadataRoute.Sitemap = categories.map((category) => ({
+  // 2. Get Category Pages (Dynamically from constants.ts)
+  // FIX: Map over ARTICLE_CATEGORIES instead of a hardcoded list
+  const categoryPages: MetadataRoute.Sitemap = ARTICLE_CATEGORIES.map((category) => ({
     url: `${URL}/category/${category}`,
     lastModified: new Date(),
     changeFrequency: 'weekly',
@@ -48,7 +50,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 4. Get Web Story Pages (from Prisma)
   const stories = await prisma.webStory.findMany({
     select: {
-      id: true, // Prisma uses 'id'
+      id: true,
       createdAt: true,
     },
   });

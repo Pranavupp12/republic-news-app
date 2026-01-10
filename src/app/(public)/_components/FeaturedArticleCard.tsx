@@ -32,7 +32,7 @@ export function FeaturedArticleCard({ article, priority = false }: FeaturedArtic
 
   return (
     // Added 'h-full' to ensure the card takes available height
-    <Card className="flex flex-col md:flex-row overflow-hidden h-full">
+    <Card className="flex flex-col md:flex-row overflow-hidden border-none h-full">
 
        {/* Right Side: Image */}
       <div className="relative w-full h-60 md:h-auto md:w-1/2 min-h-[200px] p-3 md:order-last">
@@ -48,7 +48,7 @@ export function FeaturedArticleCard({ article, priority = false }: FeaturedArtic
         </Link>
         <Badge
           variant="default"
-          className="absolute top-5 right-5 z-10"
+          className="absolute top-5 right-5 z-10 text-xs sm:text-sm"
         >
           {article.category}
         </Badge>

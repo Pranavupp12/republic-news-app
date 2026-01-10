@@ -65,12 +65,12 @@ export function SearchBar() {
     <>
       {/* IMPROVED TRIGGER BUTTON */}
       <Button
-        variant="outline"
-        className="relative h-9 w-12 justify-start rounded-[0.5rem] text-sm text-muted-foreground sm:pr-12  md:w-40 lg:w-60"
+        variant="default"
+        className="relative h-9 w-12 justify-start hover:bg-gray-100 rounded-[0.5rem] lg:border bg-white text-sm sm:pr-8  md:w-40 lg:w-55"
         onClick={() => setOpen(true)}
       >
-        <Search className="h-4 w-4 mr-2" />
-        <span className="hidden md:inline-flex">Search articles...</span>
+        <Search className="h-4 w-4 text-gray-500" />
+        <span className="hidden md:inline-flex text-gray-500">Search articles...</span>
       </Button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>

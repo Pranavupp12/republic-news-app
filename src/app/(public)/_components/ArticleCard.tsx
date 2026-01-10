@@ -38,9 +38,9 @@ export function ArticleCard({ article, priority = false }: ArticleCardProps) {
   }, [article.createdAt]);
 
   return (
-    <Card className="flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <Card className="flex flex-col overflow-hidden rounded-none">
       <CardHeader className="p-0 relative">
-        <Link href={`/article/${article.slug}`} className="block relative h-48 w-full">
+        <Link href={`/article/${article.slug}`} className="block relative h-60 w-full">
           <Image
             src={article.imageUrl || "https://placehold.co/600x400"}
             alt={article.title}
@@ -51,13 +51,13 @@ export function ArticleCard({ article, priority = false }: ArticleCardProps) {
             priority={priority}
           />
         </Link>
-        <Badge variant="default" className="absolute top-3 right-3">{article.category}</Badge>
+        <Badge variant="default" className="absolute top-3 right-3 text-xs sm:text-sm">{article.category}</Badge>
       </CardHeader>
       <CardContent className="flex flex-col flex-grow p-4">
-        <CardTitle className="text-lg font-bold mb-2">
+        <CardTitle className="text-lg font-bold mb-1">
           <Link href={`/article/${article.slug}`} className="hover:text-primary transition-colors">{article.title}</Link>
         </CardTitle>
-        <p className="text-muted-foreground mb-4 flex-grow line-clamp-3">{article.metaDescription}</p>
+        <p className="text-muted-foreground mb-3 flex-grow line-clamp-3">{article.metaDescription}</p>
         <div className="text-sm text-red-500 mt-auto">
           <span>{article.author?.name || 'Anonymous'}</span>
           <span className="mx-2 text-muted-foreground">|</span>

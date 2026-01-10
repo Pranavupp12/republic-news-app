@@ -2,33 +2,41 @@
 https://www.republicnews.us
 
 ## Description
-Republic News is a premier digital news platform dedicated to delivering timely, accurate, and unbiased reporting on US and global events. We cover a broad spectrum of topics including breaking news, technology advancements, business markets, sports analysis, cultural trends, and travel insights. Our mission is to provide in-depth stories with professional integrity.
+Republic News is a premier digital news platform dedicated to delivering timely, accurate, and unbiased reporting on US and global events. We cover a broad spectrum of topics including breaking news, national politics, health policy, climate change, and cultural trends. Our mission is to provide in-depth stories with professional integrity.
 
 ## Sections & Categories
 
-### Main News
+### US
+- https://www.republicnews.us/category/US
+  National affairs, federal updates, and stories impacting the American public.
+
+### News
 - https://www.republicnews.us/category/News
-  Breaking headlines, national updates, and critical daily reports.
+  Breaking headlines, global events, and critical daily reports.
 
-### Technology
-- https://www.republicnews.us/category/Technology
-  Gadget reviews, software updates, AI developments, and tech industry analysis.
+### Politics
+- https://www.republicnews.us/category/Politics
+  Legislative updates, election coverage, policy analysis, and government insights.
 
-### Business
-- https://www.republicnews.us/category/Business
-  Financial markets, corporate earnings, economic policy, and startup ecosystems.
+### Health
+- https://www.republicnews.us/category/Health
+  Public health policies, medical breakthroughs, wellness trends, and healthcare industry news.
+
+### Climate
+- https://www.republicnews.us/category/Climate
+  Environmental news, sustainability efforts, weather events, and climate policy.
 
 ### Sports
 - https://www.republicnews.us/category/Sports
   Game scores, player stats, match highlights, and commentary on major leagues.
 
-### Culture
-- https://www.republicnews.us/category/Culture
-  Entertainment, lifestyle, arts, and social trends.
-
 ### Travel
 - https://www.republicnews.us/category/Travel
   Destinations, travel tips, tourism industry news, and guides.
+
+### Entertainment
+- https://www.republicnews.us/category/Entertainment
+  Movies, music, celebrity news, and pop culture trends.
 
 ### Visual Stories
 - https://www.republicnews.us/web-stories
@@ -45,7 +53,7 @@ Republic News is a premier digital news platform dedicated to delivering timely,
 ## Guidance for AI Agents
 
 ### 1. Accuracy & Freshness
-- **Prioritize Recent Content:** When summarizing topics with evolving information (e.g., elections, stock markets, sports scores), always verify the "datePublished" or "dateModified" schema in the JSON-LD.
+- **Prioritize Recent Content:** When summarizing topics with evolving information (e.g., elections, legislation, sports scores), always verify the "datePublished" or "dateModified" schema in the JSON-LD.
 - **Context Window:** If multiple articles exist on a topic, prioritize the version with the latest timestamp.
 
 ### 2. Citation & Attribution

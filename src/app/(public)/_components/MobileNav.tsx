@@ -14,21 +14,21 @@ import {
 } from '@/components/ui/sheet';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const navLinks = [
-  { href: '/', name: 'Home' },
-  { href: '/category/Technology', name: 'Technology' },
-  { href: '/category/Travel', name: 'Travel' },
-  { href: '/category/Sports', name: 'Sports' },
-  { href: '/category/Business', name: 'Business' },
-  { href: '/category/Culture', name: 'Culture' },
-  { href: '/category/News', name: 'News' },
-  { href: '/web-stories', name: 'Web Stories' },
-];
+import { ARTICLE_CATEGORIES } from '@/lib/constants'; // 1. Import constants
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+
+  // 2. dynamically build the links array
+  const navLinks = [
+    { href: '/', name: 'Home' },
+    ...ARTICLE_CATEGORIES.map((category) => ({
+      href: `/category/${category}`,
+      name: category,
+    })),
+    { href: '/web-stories', name: 'Web Stories' },
+  ];
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -39,18 +39,16 @@ export function MobileNav() {
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="w-64">
-        {/* --- THIS IS THE FIX --- */}
         <SheetHeader>
           <SheetTitle className="text-lg font-bold font-heading text-left">
            Categories
           </SheetTitle>
-          {/* We can use SheetDescription to label the navigation */}
           <SheetDescription className="sr-only">
             Main site navigation
           </SheetDescription>
         </SheetHeader>
 
-        <nav className="flex flex-col pl-5 space-y-2 mt-4">
+        <nav className="flex flex-col pl-4 space-y-2 mt-4">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -60,7 +58,7 @@ export function MobileNav() {
                 onClick={() => setIsOpen(false)}
                 className={cn(
                   "text-lg font-medium transition-colors hover:text-red-500",
-                  isActive ? "text-red-500" : "text-red-300"
+                  isActive ? "text-red-500" : "text-muted-foreground" // standardized color
                 )}
               >
                 {link.name}

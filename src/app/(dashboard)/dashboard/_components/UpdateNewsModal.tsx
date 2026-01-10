@@ -27,8 +27,7 @@ import {
 } from "@/components/ui/select";
 import { RichTextEditor } from './RichTextEditor'; 
 import { Loader2 } from "lucide-react";
-
-const categories = ['Technology', 'Travel', 'Sports', 'Business', 'Culture', 'News'];
+import { ARTICLE_CATEGORIES } from '@/lib/constants';
 
 function slugify(text: string) {
   return text.toString().toLowerCase().trim()
@@ -135,7 +134,7 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((cat) => (
+                  {ARTICLE_CATEGORIES.map((cat) => (
                     <SelectItem key={cat} value={cat}>
                       {cat}
                     </SelectItem>

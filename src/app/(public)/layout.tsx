@@ -6,19 +6,13 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
-import { SearchBar } from "./_components/SearchBar"; 
+import { SearchBar } from "./_components/SearchBar";
 
 // --- FIX: Import the new wrapper component instead of using dynamic() here ---
-import DynamicMobileNav from "./_components/DynamicMobileNav"; 
+import DynamicMobileNav from "./_components/DynamicMobileNav";
 
-const categories = [
-  { name: 'Technology', href: '/category/Technology' },
-  { name: 'Travel', href: '/category/Travel' },
-  { name: 'Sports', href: '/category/Sports' },
-  { name: 'Business', href: '/category/Business' },
-  { name: 'Culture', href: '/category/Culture' },
-  { name: 'News', href: '/category/News' },
-];
+import { ARTICLE_CATEGORIES } from "@/lib/constants";
+
 
 export default function PublicLayout({
   children,
@@ -28,19 +22,19 @@ export default function PublicLayout({
   return (
     <div className="flex flex-col min-h-screen">
       <header className="bg-background sticky top-0 z-50 border-b border-border/40">
-        <div className="container mx-auto px-4 grid grid-cols-3 items-center h-14">
-          
+        <div className="container mx-auto px-8 lg:px-0 grid grid-cols-3 items-center h-18">
+
           <div className="flex justify-start">
             {/* Use the new wrapper component here */}
-            <DynamicMobileNav /> 
-            <HeaderInfo /> 
+            <DynamicMobileNav />
+            <HeaderInfo />
           </div>
 
           <div className="flex justify-center items-center w-full">
             <Link href="/" className="flex items-center">
-              <Image 
+              <Image
                 src="/logo/rn-logo.png"
-                alt="Republic News Logo" 
+                alt="Republic News Logo"
                 width={222}
                 height={39}
                 priority={true}
@@ -53,14 +47,14 @@ export default function PublicLayout({
             <SearchBar />
           </div>
         </div>
-        
+
         {/* ... Rest of the file remains exactly the same ... */}
         <div className="container mx-auto">
           <Separator />
         </div>
 
         <div className="hidden md:block">
-          <div className=" container mx-auto px-4 flex items-center justify-center h-12">
+          <div className=" container mx-auto  flex items-center justify-center h-16">
             <HeaderNav />
           </div>
         </div>
@@ -69,10 +63,10 @@ export default function PublicLayout({
       <main className="flex-grow ">{children}</main>
 
       <footer className="bg-neutral-900 text-neutral-300">
-        <div className="container mx-auto px-4 py-12 grid grid-cols-2 lg:grid-cols-2 gap-7 md:gap-0 ">
+        <div className="container mx-auto px-4 py-4 lg:py-12 grid grid-cols-2 lg:grid-cols-2 gap-7 md:gap-0 ">
           <div className="lg:col-span-1 space-y-4">
             <h3 className=" text-xl md:text-2xl font-regular font-heading text-white"><span className="text-red-500">Republic </span>News</h3>
-            <p className=" text-xs md:text-sm text-neutral-400">
+            <p className=" text-xs md:text-sm text-white">
               Your daily source for the most important headlines and in-depth<br className="hidden md:block" />
               stories from technology and business to culture and sports.
             </p>
@@ -89,10 +83,14 @@ export default function PublicLayout({
               <div className="space-y-4">
                 <h3 className=" text-xs md:text-sm font-semibold uppercase text-red-500">Categories</h3>
                 <ul className="space-y-2">
-                  {categories.map((cat) => (
-                    <li key={cat.name}>
-                      <Link href={cat.href} className="text-xs md:text-sm hover:text-red-500 transition-colors">
-                        {cat.name}
+                  {/* 2. UPDATE THE MAPPING LOGIC */}
+                  {ARTICLE_CATEGORIES.map((category) => (
+                    <li key={category}>
+                      <Link
+                        href={`/category/${category}`}
+                        className="text-xs md:text-sm hover:text-red-500 transition-colors"
+                      >
+                        {category}
                       </Link>
                     </li>
                   ))}
@@ -110,14 +108,14 @@ export default function PublicLayout({
 
               <div className="space-y-4 hidden md:block">
                 <h3 className="text-sm font-semibold uppercase text-red-500">Subscribe to our Newsletter</h3>
-                <p className="text-sm text-neutral-400">
+                <p className="text-sm text-white">
                   Get the latest headlines and updates delivered straight to your inbox.
                 </p>
                 <form className="flex w-full max-w-sm items-center">
                   <Input
                     type="email"
                     placeholder="Email"
-                    className="bg-neutral-800 border-neutral-700 text-white"
+                    className="bg-white text-black"
                   />
                   <Button type="submit" variant="default" className="hover:text-red-500">
                     Submit
@@ -130,7 +128,7 @@ export default function PublicLayout({
         </div>
 
         <div className="bg-black py-6 px-4">
-          <div className="container mx-auto text-center text-xs text-neutral-500">
+          <div className="container mx-auto text-center text-xs text-white">
             <p>© {new Date().getFullYear()} Republic News. All rights reserved.</p>
             <p className="mt-2">
               Disclaimer: Our website provides accurate and clear news. While we have Professional duties to keep

@@ -110,7 +110,7 @@ export default async function ArticlePage(props: ArticlePageProps) {
   };
 
   return (
-    <main className="container mx-auto py-10 px-10 md:px-0 max-w-4xl">
+    <main className="container mx-auto py-10 px-8 lg:px-0 max-w-5xl">
       {/* Inject JSON-LD Script */}
       <script
         type="application/ld+json"
@@ -118,7 +118,7 @@ export default async function ArticlePage(props: ArticlePageProps) {
       />
 
       <article>
-        <Badge variant="default" className="mb-4">{article.category}</Badge>
+        <Badge variant="default" className="text-xs md:text-sm mb-4">{article.category}</Badge>
 
         <h1 className="text-3xl lg:text-5xl font-extrabold font-heading tracking-tight mb-4 leading-tight">
           {article.title}
