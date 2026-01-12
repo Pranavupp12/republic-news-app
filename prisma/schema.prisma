@@ -55,3 +55,20 @@ model StorySlide {
   story     WebStory @relation(fields: [storyId], references: [id], onDelete: Cascade)
   storyId   String   @db.ObjectId
 }
+
+model PushSubscriber {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+}
+
+model NotificationLog {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  title          String
+  body           String
+  sentAt         DateTime @default(now())
+  recipientCount Int
+  articleIds     String[] 
+}

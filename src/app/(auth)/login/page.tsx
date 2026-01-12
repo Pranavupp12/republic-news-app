@@ -66,8 +66,8 @@ export default function LoginPage() {
               <Label htmlFor="password">Password</Label>
               <Input id="password" name="password" type="password" required />
             </div>
-            
-            <Button type="submit" className="w-full" disabled={isLoggingIn}>
+
+            <Button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white" disabled={isLoggingIn}>
               {isLoggingIn && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isLoggingIn ? 'Logging in...' : 'Login'}
             </Button>

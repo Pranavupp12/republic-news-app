@@ -34,6 +34,7 @@ export const metadata: Metadata = {
     default: 'Republic News - Your Source for US News',
   },
   description: 'Your daily source for breaking news and headlines from the United States.',
+  manifest: '/manifest.json',
   keywords: ['us news', 'american news', 'republic news', 'headlines', 'politics'],
   robots: {
     index: true,

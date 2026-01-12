@@ -21,6 +21,7 @@ export function StoryFilterButtons() {
       <Button
         variant={currentFilter === 'all' ? 'default' : 'outline'}
         size="sm"
+        className='border border-gray-200 bg-transparent hover:bg-gray-100 text-black'
         onClick={() => handleFilterClick('all')}
       >
         All
@@ -28,6 +29,7 @@ export function StoryFilterButtons() {
       <Button
         variant={currentFilter === 'today' ? 'default' : 'outline'}
         size="sm"
+        className='border border-gray-200 bg-transparent hover:bg-gray-100 text-black'
         onClick={() => handleFilterClick('today')}
       >
         Today

@@ -110,7 +110,7 @@ export default async function ArticlePage(props: ArticlePageProps) {
   };
 
   return (
-    <main className="container mx-auto py-10 px-8 lg:px-0 max-w-5xl">
+    <main className="container mx-auto py-10 px-8 lg:px-4 max-w-5xl">
       {/* Inject JSON-LD Script */}
       <script
         type="application/ld+json"
@@ -124,7 +124,7 @@ export default async function ArticlePage(props: ArticlePageProps) {
           {article.title}
         </h1>
 
-        <div className="text-md md:text-lg text-red-500 mb-8 font-medium">
+        <div className="text-md md:text-lg text-red-500 mb-4 sm:mb-8 font-medium">
           <span>By {article.author?.name || 'Republic News Staff'}</span>
           <span className="mx-2 text-muted-foreground">•</span>
           <time dateTime={isoDate}>
@@ -133,14 +133,14 @@ export default async function ArticlePage(props: ArticlePageProps) {
         </div>
 
         {/* --- 3. OPTIMIZED IMAGE --- */}
-        <div className="relative h-64 md:h-[500px] w-full mb-10 rounded-xl overflow-hidden shadow-sm">
+        <div className="relative h-[280px] md:h-[500px] lg:h-[620px] w-full mb-4 sm:mb-8 overflow-hidden">
           <Image
             src={article.imageUrl}
             alt={article.title}
             fill
             //100vw on mobile, 900px on desktop.
             sizes="(max-width: 768px) 100vw, 900px"
-            className="object-cover"
+            className="object-contain sm:object-cover"
             priority // Keep this for LCP
           />
         </div>

@@ -123,7 +123,7 @@ export function WebStoryManager({ stories, currentPage, articlesPerPage, totalPa
                                     <div className="space-y-2"><Label>Upload Image</Label><Input name="coverImage" type="file" accept="image/*" /></div>
                                 )}
 
-                                <Button type="submit" disabled={isSubmitting} className="w-full">
+                                <Button type="submit" disabled={isSubmitting} className="w-full bg-blue-500 hover:bg-blue-600 text-white">
                                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                     {isSubmitting ? 'Creating...' : 'Create Story'}
                                 </Button>
@@ -166,7 +166,7 @@ export function WebStoryManager({ stories, currentPage, articlesPerPage, totalPa
                                             <TableCell className="text-right space-x-2 pr-6">
                                                 <Button size="sm" variant="outline" onClick={() => handleOpenUpdateModal(story)}>Update</Button>
                                                 <Button size="sm" variant="destructive" onClick={() => handleOpenDeleteModal(story)}>Delete</Button>
-                                                <Button size="sm" asChild><Link href={`/dashboard/stories/${story.id}`}>Manage Slides</Link></Button>
+                                                <Button size="sm" className='bg-blue-500 hover:bg-blue-600 text-white' asChild><Link href={`/dashboard/stories/${story.id}`}>Manage Slides</Link></Button>
                                             </TableCell>
                                         </TableRow>
                                     ))

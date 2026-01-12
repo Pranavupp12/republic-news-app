@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { SearchBar } from "./_components/SearchBar";
+import { NotificationModal } from "./_components/NotificationModal";
 
 // --- FIX: Import the new wrapper component instead of using dynamic() here ---
 import DynamicMobileNav from "./_components/DynamicMobileNav";
@@ -21,6 +22,10 @@ export default function PublicLayout({
 }) {
   return (
     <div className="flex flex-col min-h-screen">
+
+      {/*/ --- FIX: Add NotificationModal at the top level of the layout --- */}
+      <NotificationModal />
+      
       <header className="bg-background sticky top-0 z-50 border-b border-border/40">
         <div className="container mx-auto px-8 lg:px-0 grid grid-cols-3 items-center h-18">
 
@@ -35,8 +40,8 @@ export default function PublicLayout({
               <Image
                 src="/logo/rn-logo.png"
                 alt="Republic News Logo"
-                width={222}
-                height={39}
+                width={250}
+                height={50}
                 priority={true}
                 className="object-contain"
               />

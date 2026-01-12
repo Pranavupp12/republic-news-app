@@ -58,7 +58,7 @@ export function AddSlideForm({ storyId, storyTitle }: AddSlideFormProps) {
 
                     <div className="space-y-2"><Label>Caption (Optional)</Label><Input name="caption" /></div>
                     
-                    <Button type="submit" disabled={isSubmitting}>
+                    <Button type="submit" disabled={isSubmitting} className='w-full bg-blue-500 hover:bg-blue-600 text-white'>
                         {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         {isSubmitting ? 'Adding...' : 'Add Slide'}
                     </Button>

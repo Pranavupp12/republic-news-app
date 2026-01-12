@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
+import { sendNotificationToAll } from "@/actions/notificationActions";
 import { v2 as cloudinary } from 'cloudinary';
 
 // This configures Cloudinary with the credentials from your .env.local file
@@ -85,6 +86,12 @@ export async function createArticle(formData: FormData) {
         authorId: session.user.id,
       },
     });
+
+    sendNotificationToAll(
+        `New Article: ${title}`, 
+        "Check out the latest story on Republic News!",
+        `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.republicnews.us'}/article/${slug}`
+    ).catch(err => console.error("Notification failed", err));
 
     revalidatePath("/dashboard");
     revalidatePath("/");

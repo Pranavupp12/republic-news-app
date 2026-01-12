@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   robots: {
     index: false, //  Tell search engines *not* to index this page
     follow: false, // Tell search engines *not* to follow links from this page
-    nocache: true, // Ask search engines not to cache this page
+    nocache: false, // Ask search engines to cache this page
   },
 };
 

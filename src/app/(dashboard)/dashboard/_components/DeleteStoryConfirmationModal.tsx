@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -7,19 +8,36 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogClose, // Import DialogClose
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react'; // Import Spinner
 
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  // Update type to Promise so we can await it
+  onConfirm: () => Promise<void>; 
 }
 
 export function DeleteStoryConfirmationModal({ isOpen, onClose, onConfirm }: DeleteConfirmationModalProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // FIX: Reset the state every time the modal opens to prevent the "infinite load" glitch
+  useEffect(() => {
+    if (isOpen) {
+      setIsDeleting(false);
+    }
+  }, [isOpen]);
+
+  const handleDeleteClick = async () => {
+    setIsDeleting(true);
+    await onConfirm();
+    // No need to set false here manually, the useEffect handles it on next open
+    // or the component unmounts/closes.
+  };
+
   return (
-    // Use the standard Dialog component
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
@@ -30,15 +48,22 @@ export function DeleteStoryConfirmationModal({ isOpen, onClose, onConfirm }: Del
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          {/* DialogClose will act as the "Cancel" button and also work with the 'X' icon */}
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" disabled={isDeleting}>Cancel</Button>
           </DialogClose>
           <Button
-            onClick={onConfirm}
+            onClick={handleDeleteClick}
             variant="destructive"
+            disabled={isDeleting}
           >
-            Yes, delete story
+            {isDeleting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Deleting...
+              </>
+            ) : (
+              'Yes, delete story'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

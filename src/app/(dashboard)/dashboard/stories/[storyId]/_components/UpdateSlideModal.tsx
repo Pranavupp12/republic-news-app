@@ -17,6 +17,7 @@ import type { StorySlide } from "@prisma/client";
 import { updateSlide } from "@/actions/webStoryAction";
 import { toast } from "sonner";
 import Image from "next/image";
+import { Loader2 } from "lucide-react";
 
 interface UpdateSlideModalProps {
   isOpen: boolean;
@@ -44,9 +45,9 @@ export function UpdateSlideModal({ isOpen, onClose, slide }: UpdateSlideModalPro
 
     const form = e.currentTarget as HTMLFormElement;
     const formData = new FormData(form);
-    
+
     const result = await updateSlide(slide.id, formData);
-    
+
     if (result.success) {
       toast.success('Slide updated successfully!');
       onClose();
@@ -74,10 +75,10 @@ export function UpdateSlideModal({ isOpen, onClose, slide }: UpdateSlideModalPro
           <div className="space-y-2">
             <Label>Current Image</Label>
             <div className="relative h-48 w-full rounded-md overflow-hidden">
-                <Image src={slide.imageUrl} alt="Current slide image" fill className="object-cover"/>
+              <Image src={slide.imageUrl} alt="Current slide image" fill className="object-cover" />
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <Label>New Image (Optional)</Label>
             <RadioGroup name="slideImageSource" value={imageSource} onValueChange={(v: 'url' | 'upload') => setImageSource(v)} className="flex items-center space-x-4">
@@ -87,15 +88,22 @@ export function UpdateSlideModal({ isOpen, onClose, slide }: UpdateSlideModalPro
           </div>
 
           {imageSource === 'url' ? (
-            <div className="space-y-2"><Label>Image URL</Label><Input name="slideImageUrl" placeholder="Leave blank to keep current image"/></div>
+            <div className="space-y-2"><Label>Image URL</Label><Input name="slideImageUrl" placeholder="Leave blank to keep current image" /></div>
           ) : (
-            <div className="space-y-2"><Label>Upload Image</Label><Input name="slideImage" type="file" accept="image/*"/></div>
+            <div className="space-y-2"><Label>Upload Image</Label><Input name="slideImage" type="file" accept="image/*" /></div>
           )}
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>Cancel</Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Updating...' : 'Save changes'}
+            <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                'Save changes'
+              )}
             </Button>
           </DialogFooter>
         </form>

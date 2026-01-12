@@ -74,6 +74,7 @@ export function FilterButtons({ categories, scrollTargetId }: FilterButtonsProps
       <Button
         variant={currentView === 'all' ? 'default' : 'outline'}
         size="sm"
+        className='border border-gray-200 bg-transparent hover:bg-gray-100 text-black'
         onClick={() => handleViewChange('all')}
       >
         All
@@ -81,6 +82,7 @@ export function FilterButtons({ categories, scrollTargetId }: FilterButtonsProps
       <Button
         variant={currentView === 'today' ? 'default' : 'outline'}
         size="sm"
+         className='border border-gray-200 bg-transparent hover:bg-gray-100 text-black'
         onClick={() => handleViewChange('today')}
       >
         Today

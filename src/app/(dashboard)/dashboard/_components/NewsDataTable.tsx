@@ -16,6 +16,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { TrendingToggleButton } from './TrendingToggleButton';
+import { SendNotificationButton } from './SendNotificationButton'; // Import the button
 
 type ArticleWithAuthor = Article & {
   author: User | null;
@@ -82,7 +83,6 @@ export function NewsDataTable({ articles, currentPage, articlesPerPage, isTodayF
         <Table>
           <TableHeader>
             <TableRow>
-              {/* CHANGE 1: Add the new column header */}
               <TableHead className="w-[50px]">S.No.</TableHead>
               <TableHead>Title</TableHead>
               <TableHead>Category</TableHead>
@@ -95,11 +95,12 @@ export function NewsDataTable({ articles, currentPage, articlesPerPage, isTodayF
           </TableHeader>
           <TableBody>
             {articles.length > 0 ? (
-              // CHANGE 2: Get the "index" from the map function
               articles.map((article, index) => (
                 <TableRow key={article.id}>
-                  {/* And display the serial number (index + 1) */}
+                  {/* Serial Number */}
                   <TableCell className="font-medium">{serialNumberOffset + index + 1}</TableCell>
+                  
+                  {/* Title with Tooltip */}
                   <TableCell>
                     <TooltipProvider>
                       <Tooltip>
@@ -112,22 +113,44 @@ export function NewsDataTable({ articles, currentPage, articlesPerPage, isTodayF
                       </Tooltip>
                     </TooltipProvider>
                   </TableCell>
+                  
+                  {/* Category */}
                   <TableCell>{article.category}</TableCell>
+                  
+                  {/* Feature Toggles (Hidden on 'Today' filter) */}
                   {!isTodayFilterActive && (
                     <TableCell>
                       <FeaturedToggleButton article={article} />
                     </TableCell>
                   )}
                   {!isTodayFilterActive && (
-                    <TableCell><TrendingToggleButton article={article} trendingCount={trendingCount} /></TableCell>
+                    <TableCell>
+                      <TrendingToggleButton article={article} trendingCount={trendingCount} />
+                    </TableCell>
                   )}
+                  
+                  {/* Author & Date */}
                   <TableCell>{article.author?.name || 'N/A'}</TableCell>
                   <TableCell>
                     {new Date(article.createdAt).toLocaleDateString('en-IN')}
                   </TableCell>
+                  
+                  {/* ACTIONS COLUMN */}
                   <TableCell className="text-right">
-                    <Button variant="outline" size="sm" className="mr-2" onClick={() => handleOpenUpdateModal(article)}>Update</Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleOpenDeleteModal(article)}>Delete</Button>
+                    <div className="flex items-center justify-end gap-2">
+                      {/* 1. Notification Button */}
+                      <SendNotificationButton article={article} />
+
+                      {/* 2. Update Button */}
+                      <Button variant="outline" size="sm" onClick={() => handleOpenUpdateModal(article)}>
+                        Update
+                      </Button>
+
+                      {/* 3. Delete Button */}
+                      <Button variant="destructive" size="sm" onClick={() => handleOpenDeleteModal(article)}>
+                        Delete
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -142,6 +165,7 @@ export function NewsDataTable({ articles, currentPage, articlesPerPage, isTodayF
         </Table>
       </div>
 
+      {/* Modals live outside the table to prevent layout issues */}
       <UpdateNewsModal article={articleToUpdate} isOpen={isUpdateModalOpen} onClose={handleCloseUpdateModal} />
       <DeleteConfirmationModal isOpen={isDeleteModalOpen} onClose={handleCloseDeleteModal} onConfirm={handleConfirmDelete} />
     </>

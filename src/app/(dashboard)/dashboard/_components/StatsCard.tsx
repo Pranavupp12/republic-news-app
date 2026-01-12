@@ -28,7 +28,7 @@ interface StatsCardProps {
 
 export function StatsCard({ stats }: StatsCardProps) {
   return (
-    <Card className="min-h-[520px]">
+    <Card className="min-h-[520px] border-none" >
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-x-2 font-heading">
             <Newspaper className="h-6 w-6" />
