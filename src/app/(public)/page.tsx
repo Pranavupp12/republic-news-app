@@ -1,15 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { NewsGrid } from "./_components/NewsGrid";
 import { PaginationControls } from "@/components/ui/PaginationControls";
-import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { FeaturedArticleCard } from "./_components/FeaturedArticleCard";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import type { Metadata } from 'next';
 import { format } from 'date-fns-tz';
-import { unstable_cache } from "next/cache"; // <-- IMPORT THIS
+import { unstable_cache } from "next/cache"; 
+import { EntertainmentCarousel } from "./_components/EntertainmentCarousel";
+import { DiscoverNewsLayout } from "./_components/DiscoverNewsLayout";
 
 export const metadata: Metadata = {
   title: "Latest US News & Breaking Headlines",
@@ -20,27 +20,27 @@ export const metadata: Metadata = {
 const FEATURED_ARTICLES_COUNT = 7;
 const ARTICLES_PER_PAGE = 6;
 
-// --- 1. CACHED QUERY FOR TODAY'S ARTICLES ---
-const getCachedTodaysArticles = unstable_cache(
-  async (today: Date) => {
+// --- 1. CACHED QUERY FOR HEADLINES (Smart Fill) ---
+const getCachedHeadlines = unstable_cache(
+  async () => {
     return await prisma.article.findMany({
-      where: { createdAt: { gte: today } },
+      take: 3, 
       orderBy: { createdAt: 'desc' },
       include: { author: true },
     });
   },
-  ['todays-articles'], 
-  { revalidate: 60 } // Revalidate every 60 seconds
+  ['headlines-articles-main'],
+  { revalidate: 60 } 
 );
 
 // --- 2. CACHED QUERY FOR FEATURED OLDER ARTICLES ---
 const getCachedFeaturedOlderArticles = unstable_cache(
-  async (today: Date) => {
+  async (excludeIds: string[]) => {
     return await prisma.article.findMany({
       take: FEATURED_ARTICLES_COUNT,
       where: {
         isFeatured: true,
-        createdAt: { lt: today }
+        id: { notIn: excludeIds } 
       },
       orderBy: { createdAt: 'desc' },
       include: { author: true },
@@ -63,8 +63,24 @@ const getCachedTrendingArticles = unstable_cache(
   { revalidate: 60 }
 );
 
+// --- 4. CACHED QUERY FOR ENTERTAINMENT ---
+const getCachedEntertainmentArticles = unstable_cache(
+  async () => {
+    return await prisma.article.findMany({
+      where: {
+        category: { has: 'Entertainment' }
+      },
+      take: 10, 
+      orderBy: { createdAt: 'desc' },
+      include: { author: true },
+    });
+  },
+  ['entertainment-articles-home'],
+  { revalidate: 60 }
+);
+
 interface HomePageProps {
-  searchParams: Promise<{ page?: string }>; // Updated for Next.js 15+ await rules
+  searchParams: Promise<{ page?: string }>; 
 }
 
 export default async function HomePage(props: HomePageProps) {
@@ -74,34 +90,38 @@ export default async function HomePage(props: HomePageProps) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // --- USE THE CACHED FUNCTIONS ---
-  // We run them in parallel for even more speed
-  const [todaysArticles, featuredOlderArticles, trendingArticles] = await Promise.all([
-    getCachedTodaysArticles(today),
-    getCachedFeaturedOlderArticles(today),
+  // --- STEP 1: Fetch Headlines First ---
+  const headlinesData = await getCachedHeadlines();
+  
+  // Extract IDs to exclude from other lists
+  const headlineIds = headlinesData.map(article => article.id);
+
+  // --- STEP 2: Fetch Other Data in Parallel ---
+  const [featuredOlderArticles, trendingArticles, entertainmentArticles] = await Promise.all([
+    getCachedFeaturedOlderArticles(headlineIds),
     getCachedTrendingArticles(),
+    getCachedEntertainmentArticles()
   ]);
 
-  // Note: Pagination queries usually shouldn't be heavily cached if they change often, 
-  // but since this is "older news", we keep it direct or could cache it too. 
-  // For now, let's keep the paginated list direct to ensure accuracy on page changes,
-  // as it is less critical for the "Above the Fold" LCP speed.
-  
+  // --- FIX: Exclude Headline IDs from Discover More Count ---
   const totalPaginatedArticles = await prisma.article.count({
     where: {
       isFeatured: { not: true },
-      createdAt: { lt: today }
+      createdAt: { lt: today },
+      id: { notIn: headlineIds } // <--- Added this exclusion
     }
   });
 
   const totalPages = Math.ceil(Math.max(0, totalPaginatedArticles) / ARTICLES_PER_PAGE);
 
+  // --- FIX: Exclude Headline IDs from Discover More List ---
   const paginatedOlderArticles = await prisma.article.findMany({
     take: ARTICLES_PER_PAGE,
     skip: (Number(page) - 1) * ARTICLES_PER_PAGE,
     where: {
       isFeatured: { not: true },
-      createdAt: { lt: today }
+      createdAt: { lt: today },
+      id: { notIn: headlineIds } // <--- Added this exclusion
     },
     orderBy: { createdAt: 'desc' },
     include: { author: true },
@@ -110,75 +130,126 @@ export default async function HomePage(props: HomePageProps) {
   return (
     <main className="container mx-auto py-4 lg:py-10 px-4 lg:px-0">
       {/* --- TOP SECTION --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
 
-        {/* --- SWAPPED: LEFT COLUMN IS NOW FEATURED & TRENDING --- */}
+        {/* --- LEFT COLUMN: FEATURED & TRENDING --- */}
         <div className="lg:col-span-1 order-2 lg:order-1">
-          <Card>
+          <Card className="border-none">
             <CardContent className="px-4 pt-5 pb-5">
-              <h2 className="text-2xl text-red-500 font-bold font-heading mb-2">Featured</h2>
+              <h2 className="text-2xl text-black font-semibold font-heading mb-2 block lg:hidden">
+                more news
+              </h2>
               <div className="space-y-4 max-h-[485px] overflow-y-auto hide-scrollbar pr-2">
                 {featuredOlderArticles.length > 0 ? (
-                  featuredOlderArticles.map((article, index) => (
-                    <div key={article.id}>
-                      <Link href={`/article/${article.slug}`} className="block group">
-                        <Badge variant="default" className="mb-1 text-xs sm:text-sm">{article.category}</Badge>
-                        <h3 className="font-bold font-heading group-hover:text-primary transition-colors">{article.title}</h3>
+                  featuredOlderArticles.map((article, index) => {
+                    const categories = Array.isArray(article.category)
+                      ? article.category
+                      : article.category
+                        ? [article.category]
+                        : [];
 
-                        <p className="text-xs text-red-500 mt-1">
-                          <span>{article.author?.name || 'Anonymous'}</span>
-                          <span className="mx-2 text-muted-foreground">|</span>
-                          <span>
-                            {format(new Date(article.createdAt), 'MMM d, yyyy, h:mm a', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone })}
-                          </span>
-                        </p>
+                    return (
+                      <div key={article.id}>
+                        <Link href={`/article/${article.slug}`} className="block group">
 
-                      </Link>
-                      {index < featuredOlderArticles.length - 1 && <Separator className="mt-4" />}
-                    </div>
-                  ))
+                          {categories.length > 0 && (
+                            <div className="text-xs font-bold text-red-500 uppercase tracking-wider mb-2">
+                              {categories.join(" • ")}
+                            </div>
+                          )}
+
+                          <h3 className="font-bold font-heading group-hover:underline decoration-red-500 underline-offset-4 decoration-2 mb-2">
+                            {article.title}
+                          </h3>
+
+                          <p className="text-xs mt-1">
+                            <span className="uppercase text-black font-bold">{article.author?.name || "Anonymous"}</span>
+                            <span className="mx-2 text-muted-foreground">|</span>
+                            <span>
+                              {format(
+                                new Date(article.createdAt),
+                                "MMM d, yyyy, h:mm a",
+                                {
+                                  timeZone:
+                                    Intl.DateTimeFormat().resolvedOptions().timeZone,
+                                }
+                              )}
+                            </span>
+                          </p>
+                        </Link>
+                        {index < featuredOlderArticles.length - 1 && (
+                          <Separator className="mt-4" />
+                        )}
+                      </div>
+                    );
+                  })
                 ) : (
                   <p className="text-sm text-muted-foreground">No featured articles.</p>
                 )}
               </div>
             </CardContent>
           </Card>
-          
-          <Card className="mt-6">
-            <CardContent className="p-4 pt-5 pb-5">
-              <h2 className="text-2xl font-bold font-heading mb-2"><span className="text-red-500">Trending</span> Topics</h2>
-              <div className="flex flex-wrap gap-2">
+
+          <Card className="mt-6 border-0 border-t border-gray-200 shadow-none">
+            <CardContent className="px-0 pt-6 pb-5">
+              <h2 className="text-xl font-bold font-heading mb-4 px-4 flex items-center gap-2">
+                <span className="text-red-600">Trending</span> Now
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-5 h-5 text-red-600"
+                >
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                  <polyline points="17 6 23 6 23 12" />
+                </svg>
+              </h2>
+
+              <div className="flex flex-col">
                 {trendingArticles.length > 0 ? (
-                  trendingArticles.map((article) => (
-                    <Button key={article.id} variant="secondary" size="sm" asChild>
-                      <Link href={`/article/${article.slug}`}>
+                  trendingArticles.map((article, index) => (
+                    <Link
+                      key={article.id}
+                      href={`/article/${article.slug}`}
+                      className="group flex items-start gap-3 py-3 px-4 hover:bg-slate-50 transition-colors border-l-2 border-transparent hover:border-red-500"
+                    >
+                      <span className="text-2xl font-black text-gray-200 group-hover:text-red-500/50 transition-colors -mt-1 leading-none select-none">
+                        {index + 1}
+                      </span>
+                      <span className="font-medium text-gray-700 group-hover:text-red-600 transition-colors text-sm leading-snug">
                         {article.trendingTopic}
-                      </Link>
-                    </Button>
+                      </span>
+                    </Link>
                   ))
                 ) : (
-                  <p className="text-sm text-muted-foreground">No trending topics right now.</p>
+                  <p className="px-4 text-sm text-muted-foreground">
+                    No trending topics right now.
+                  </p>
                 )}
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* --- SWAPPED: RIGHT COLUMN IS NOW TODAY'S HEADLINES --- */}
+        {/* --- RIGHT COLUMN: HEADLINES --- */}
         <div className="lg:col-span-2 order-1 lg:order-2">
-          <Card>
+          <Card className="border-none">
             <CardContent className="pt-5 pb-5">
-              <h1 className="text-2xl font-bold font-heading mb-2 text-center"><span className="text-red-500">Today&apos;s</span> Headlines</h1>
-              {todaysArticles.length > 0 ? (
+              <h1 className="text-3xl font-semibold font-heading mb-2 text-left px-4"><span className="text-red-500">Latest</span> Headlines</h1>
+              {headlinesData.length > 0 ? (
                 <div className="space-y-8 max-h-[740px] overflow-y-auto hide-scrollbar">
-                  {todaysArticles.map((article,index) => (
+                  {headlinesData.map((article, index) => (
                     <FeaturedArticleCard key={article.id} article={article} priority={index < 2} />
                   ))}
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-full bg-muted/50 rounded-lg p-8">
                   <p className="text-sm text-muted-foreground">
-                    No news published today.
+                    No news available at the moment.
                   </p>
                 </div>
               )}
@@ -188,12 +259,22 @@ export default async function HomePage(props: HomePageProps) {
 
       </div>
 
-      {/* --- BOTTOM SECTION (Unchanged) --- */}
+      {/* --- ENTERTAINMENT CAROUSEL --- */}
+      <EntertainmentCarousel articles={entertainmentArticles} />
+
+      {/* --- DISCOVER MORE --- */}
       {paginatedOlderArticles.length > 0 && (
-        <section id="more-news" className="mt-8 lg:mt-12">
-          <Separator />
-          <h2 className="text-3xl font-bold font-heading my-6 lg:my-8 text-center"><span className="text-red-500">Discover</span> More</h2>
-          <NewsGrid initialArticles={paginatedOlderArticles} columns={3} />
+        <section id="more-news" className="mt-8 mb-12">
+          <h2 className="text-3xl font-semibold font-heading text-black mb-4">
+            Discover More
+          </h2>
+
+          {paginatedOlderArticles.length >= 5 ? (
+            <DiscoverNewsLayout articles={paginatedOlderArticles} />
+          ) : (
+            <NewsGrid initialArticles={paginatedOlderArticles} columns={3} />
+          )}
+
           {totalPages > 1 && (
             <div className="mt-12">
               <PaginationControls

@@ -18,13 +18,7 @@ import { toast } from "sonner";
 import { updateArticle } from "@/actions/newsActions";
 import type { Article } from '@prisma/client';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox"; // 1. Import Checkbox
 import { RichTextEditor } from './RichTextEditor'; 
 import { Loader2 } from "lucide-react";
 import { ARTICLE_CATEGORIES } from '@/lib/constants';
@@ -50,8 +44,9 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [content, setContent] = useState('');
-  // 1. Add Category State
-  const [category, setCategory] = useState(''); 
+  
+  // 2. Change state to Array
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   // Sync prop to local state when the modal opens/article changes
   useEffect(() => {
@@ -59,9 +54,17 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
       setTitle(article.title);
       setSlug(article.slug || '');
       setContent(article.content);
-      // 2. Load existing category
-      setCategory(article.category); 
       setImageSource('url'); 
+      
+      // 3. Safely load categories (Handle both Array and legacy String data)
+      if (Array.isArray(article.category)) {
+        setSelectedCategories(article.category);
+      } else if (typeof article.category === 'string') {
+        // Fallback for old data not yet migrated
+        setSelectedCategories([article.category]);
+      } else {
+        setSelectedCategories([]);
+      }
     }
   }, [article]);
 
@@ -71,17 +74,28 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
     setSlug(slugify(newTitle)); 
   };
 
+  // 4. Handle Checkbox Toggles
+  const handleCategoryToggle = (cat: string) => {
+    setSelectedCategories((prev) => 
+      prev.includes(cat) 
+        ? prev.filter((c) => c !== cat) // Uncheck
+        : [...prev, cat] // Check
+    );
+  };
+
   if (!article) return null; 
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
     
+    // 5. FormData automatically captures inputs with name="category" (the checkboxes)
     const formData = new FormData(event.currentTarget);
     formData.set('content', content); 
-    // 3. Manually append the category
-    formData.set('category', category); 
     
+    // REMOVED: formData.set('category', category); 
+    // We let the native checkboxes handle the multiple values.
+
     const result = await updateArticle(article.id, formData);
 
     if (result.success) {
@@ -121,31 +135,40 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
               <p className="text-xs text-muted-foreground">e.g., /article/{slug}</p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              {/* 4. Use Controlled Component */}
-              <Select 
-                name="category" 
-                value={category} 
-                onValueChange={setCategory} 
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {ARTICLE_CATEGORIES.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
+            {/* 6. Replace Select with Checkbox Grid */}
+            <div className="space-y-3">
+              <Label>Categories (Select at least one)</Label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 border p-4 rounded-md">
+                {ARTICLE_CATEGORIES.map((cat) => (
+                  <div key={cat} className="flex items-center space-x-2">
+                    <Checkbox 
+                      id={`update-cat-${cat}`} 
+                      name="category" // Essential for FormData
+                      value={cat}
+                      checked={selectedCategories.includes(cat)}
+                      onCheckedChange={() => handleCategoryToggle(cat)}
+                    />
+                    <Label 
+                      htmlFor={`update-cat-${cat}`} 
+                      className="text-sm font-normal cursor-pointer select-none"
+                    >
                       {cat}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    </Label>
+                  </div>
+                ))}
+              </div>
+              {selectedCategories.length === 0 && (
+                <p className="text-[0.8rem] font-medium text-destructive">
+                  Please select at least one category.
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label>Current Image</Label>
-              <Image src={article.imageUrl} alt={article.title} width={100} height={100} className="rounded-md object-cover border" />
+              <div className="relative w-24 h-24 rounded-md overflow-hidden border">
+                 <Image src={article.imageUrl} alt={article.title} fill className="object-cover" />
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -156,8 +179,8 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
                 onValueChange={(value: 'url' | 'upload') => setImageSource(value)}
                 className="flex items-center space-x-4"
               >
-                <div className="flex items-center space-x-2"><RadioGroupItem value="url" id="r-url" /><Label htmlFor="r-url">URL</Label></div>
-                <div className="flex items-center space-x-2"><RadioGroupItem value="upload" id="r-upload" /><Label htmlFor="r-upload">Upload</Label></div>
+                <div className="flex items-center space-x-2"><RadioGroupItem value="url" id="r-update-url" /><Label htmlFor="r-update-url">URL</Label></div>
+                <div className="flex items-center space-x-2"><RadioGroupItem value="upload" id="r-update-upload" /><Label htmlFor="r-update-upload">Upload</Label></div>
               </RadioGroup>
             </div>
 
@@ -199,7 +222,7 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
           
           <DialogFooter className="pt-4 border-t">
             <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white" disabled={isSubmitting || selectedCategories.length === 0}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isSubmitting ? 'Saving...' : 'Save Changes'}
             </Button>

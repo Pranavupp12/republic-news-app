@@ -22,7 +22,7 @@ model Article {
   title     String
   content   String
   imageUrl  String
-  category  String
+  category  String[]  
   slug            String?   @unique
   metaTitle       String?
   metaDescription String?

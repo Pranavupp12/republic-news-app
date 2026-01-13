@@ -9,16 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { createArticle } from "@/actions/newsActions";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Loader2 } from 'lucide-react';
 import { RichTextEditor } from './RichTextEditor';
-import { ARTICLE_CATEGORIES } from '@/lib/constants';
+import { Checkbox } from "@/components/ui/checkbox"; // 1. Import Checkbox
+
+// You can use your constant or this hardcoded list
+const CATEGORY_LIST = ["US", "World", "Politics", "Business", "Tech", "Science", "Health", "Sports", "Entertainment"];
 
 function slugify(text: string) {
   return text.toString().toLowerCase().trim()
@@ -35,13 +31,23 @@ export function AddNewsForm() {
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [content, setContent] = useState('');
-  // 1. ADD STATE FOR CATEGORY
-  const [category, setCategory] = useState(''); 
+  
+  // 2. CHANGE STATE TO ARRAY
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
     setSlug(slugify(newTitle)); 
+  };
+
+  // 3. HANDLE CHECKBOX TOGGLES
+  const handleCategoryToggle = (cat: string) => {
+    setSelectedCategories((prev) => 
+      prev.includes(cat) 
+        ? prev.filter((c) => c !== cat) // Uncheck
+        : [...prev, cat] // Check
+    );
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -50,9 +56,10 @@ export function AddNewsForm() {
     const form = event.currentTarget;
     const formData = new FormData(form);
 
-    // 2. MANUALLY APPEND THE CONTENT AND CATEGORY TO FORM DATA
-    formData.set('content', content); // .set replaces existing if any
-    formData.set('category', category); // This ensures the selected value is sent, not the default
+    // 4. MANUALLY SET CONTENT ONLY
+    // We do NOT need to manually set 'category' here anymore.
+    // Because the checkboxes have name="category", formData already includes all selected values!
+    formData.set('content', content); 
 
     const result = await createArticle(formData);
 
@@ -60,11 +67,11 @@ export function AddNewsForm() {
       toast.success("Success", { description: "Article created successfully." });
       form.reset();
       
-      // 3. RESET ALL STATES
+      // 5. RESET ALL STATES
       setTitle('');
       setSlug('');
       setContent('');
-      setCategory(''); // Reset category
+      setSelectedCategories([]); // Reset selection
       setImageSource('url');
     } else {
       toast.error("Error", { description: result.error || "Failed to create article." });
@@ -90,26 +97,33 @@ export function AddNewsForm() {
             <p className="text-xs text-muted-foreground">e.g., /article/{slug}</p>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
-            {/* 4. BIND VALUE AND ONVALUECHANGE TO STATE */}
-            <Select 
-              name="category" 
-              required 
-              value={category} 
-              onValueChange={setCategory}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {ARTICLE_CATEGORIES.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
+          {/* 6. REPLACED SELECT WITH CHECKBOX GRID */}
+          <div className="space-y-3">
+            <Label>Categories (Select at least one)</Label>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 border p-4 rounded-md">
+              {CATEGORY_LIST.map((cat) => (
+                <div key={cat} className="flex items-center space-x-2">
+                  <Checkbox 
+                    id={`cat-${cat}`} 
+                    name="category" // MUST match what getAll('category') looks for
+                    value={cat}
+                    checked={selectedCategories.includes(cat)}
+                    onCheckedChange={() => handleCategoryToggle(cat)}
+                  />
+                  <Label 
+                    htmlFor={`cat-${cat}`} 
+                    className="text-sm font-normal cursor-pointer select-none"
+                  >
                     {cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                  </Label>
+                </div>
+              ))}
+            </div>
+            {selectedCategories.length === 0 && (
+              <p className="text-[0.8rem] font-medium text-destructive">
+                Please select at least one category.
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -125,6 +139,7 @@ export function AddNewsForm() {
             <div className="space-y-2"><Label htmlFor="imageFile">Upload Image</Label><Input id="imageFile" name="imageFile" type="file" accept="image/*" /></div>
           )}
 
+          {/* SEO Fields ... */}
           <div className="space-y-2">
             <Label htmlFor="metaTitle">Meta Title (SEO)</Label>
             <Input id="metaTitle" name="metaTitle" placeholder="Optional: SEO-friendly title" />
@@ -147,7 +162,7 @@ export function AddNewsForm() {
             />
           </div>
 
-          <Button type="submit" className="w-full bg-blue-500 text-white hover:bg-blue-600" disabled={isSubmitting}>
+          <Button type="submit" className="w-full bg-blue-500 text-white hover:bg-blue-600" disabled={isSubmitting || selectedCategories.length === 0}>
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isSubmitting ? 'Publishing...' : 'Publish Article'}
           </Button>

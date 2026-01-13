@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { TrendingToggleButton } from './TrendingToggleButton';
 import { SendNotificationButton } from './SendNotificationButton'; // Import the button
+import { Badge } from '@/components/ui/badge';
 
 type ArticleWithAuthor = Article & {
   author: User | null;
@@ -99,7 +100,7 @@ export function NewsDataTable({ articles, currentPage, articlesPerPage, isTodayF
                 <TableRow key={article.id}>
                   {/* Serial Number */}
                   <TableCell className="font-medium">{serialNumberOffset + index + 1}</TableCell>
-                  
+
                   {/* Title with Tooltip */}
                   <TableCell>
                     <TooltipProvider>
@@ -113,10 +114,17 @@ export function NewsDataTable({ articles, currentPage, articlesPerPage, isTodayF
                       </Tooltip>
                     </TooltipProvider>
                   </TableCell>
-                  
+
                   {/* Category */}
-                  <TableCell>{article.category}</TableCell>
-                  
+                  <TableCell>{article.category.map((cat, index) => (
+                    <div key={index} className="inline-block mr-2 mb-1">
+                      <Badge key={index} variant="secondary" className="text-xs ">
+                      {cat}
+                    </Badge>
+                    </div>
+                    
+                  ))}</TableCell>
+
                   {/* Feature Toggles (Hidden on 'Today' filter) */}
                   {!isTodayFilterActive && (
                     <TableCell>
@@ -128,13 +136,13 @@ export function NewsDataTable({ articles, currentPage, articlesPerPage, isTodayF
                       <TrendingToggleButton article={article} trendingCount={trendingCount} />
                     </TableCell>
                   )}
-                  
+
                   {/* Author & Date */}
                   <TableCell>{article.author?.name || 'N/A'}</TableCell>
                   <TableCell>
                     {new Date(article.createdAt).toLocaleDateString('en-IN')}
                   </TableCell>
-                  
+
                   {/* ACTIONS COLUMN */}
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">

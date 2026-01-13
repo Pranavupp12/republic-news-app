@@ -1,10 +1,9 @@
-// src/components/ArticleCard.tsx
 'use client'; 
 
 import type { Article, User } from '@prisma/client';
 import Link from "next/link";
 import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
+// Removed Badge import as it is no longer used
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState, useEffect } from 'react';
 
@@ -14,7 +13,6 @@ type ArticleWithAuthor = Article & {
 
 interface ArticleCardProps {
   article: ArticleWithAuthor;
-  // OPTIMIZATION 1: Accept a priority prop to control lazy loading
   priority?: boolean;
 }
 
@@ -22,8 +20,6 @@ export function ArticleCard({ article, priority = false }: ArticleCardProps) {
   const [formattedDate, setFormattedDate] = useState('');
 
   useEffect(() => {
-    // OPTIMIZATION 2: Use native browser API instead of importing date-fns
-    // This removes the need to bundle a library for client-side formatting
     const date = new Date(article.createdAt);
     setFormattedDate(
       date.toLocaleString('en-US', {
@@ -37,8 +33,13 @@ export function ArticleCard({ article, priority = false }: ArticleCardProps) {
     );
   }, [article.createdAt]);
 
+  // SAFEGUARD: Ensure categories is always an array
+  const categories = Array.isArray(article.category) 
+    ? article.category 
+    : (article.category ? [article.category] : []);
+
   return (
-    <Card className="flex flex-col overflow-hidden rounded-none">
+    <Card className="flex flex-col overflow-hidden rounded-none h-full group">
       <CardHeader className="p-0 relative">
         <Link href={`/article/${article.slug}`} className="block relative h-60 w-full">
           <Image
@@ -47,20 +48,36 @@ export function ArticleCard({ article, priority = false }: ArticleCardProps) {
             fill
             style={{ objectFit: "cover" }}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            // OPTIMIZATION 1: Only prioritize if explicitly told to (e.g., top 2 items)
             priority={priority}
+            className="transition-transform duration-500 group-hover:scale-105"
           />
         </Link>
-        <Badge variant="default" className="absolute top-3 right-3 text-xs sm:text-sm">{article.category}</Badge>
+        
+        {/* REMOVED: Absolute Badge overlay */}
       </CardHeader>
+      
       <CardContent className="flex flex-col flex-grow p-4">
-        <CardTitle className="text-lg font-bold mb-1">
-          <Link href={`/article/${article.slug}`} className="hover:text-primary transition-colors">{article.title}</Link>
+        
+        {/* UPDATED: Category Text above Title */}
+        {categories.length > 0 && (
+          <div className="text-xs font-bold text-red-500 uppercase tracking-wider mb-2">
+            {categories.join(" • ")}
+          </div>
+        )}
+
+        <CardTitle className="text-lg font-bold mb-2 leading-tight">
+          <Link href={`/article/${article.slug}`} className="group-hover:text-red-600 transition-colors">
+            {article.title}
+          </Link>
         </CardTitle>
-        <p className="text-muted-foreground mb-3 flex-grow line-clamp-3">{article.metaDescription}</p>
-        <div className="text-sm text-red-500 mt-auto">
-          <span>{article.author?.name || 'Anonymous'}</span>
-          <span className="mx-2 text-muted-foreground">|</span>
+        
+        <p className="text-muted-foreground mb-4 flex-grow line-clamp-3 text-sm">
+          {article.metaDescription}
+        </p>
+        
+        <div className="text-xs font-medium text-gray-500 mt-auto uppercase tracking-wide border-t pt-3 flex items-center">
+          <span className="text-red-600 font-bold mr-2">{article.author?.name || 'Anonymous'}</span>
+          <span className="text-gray-300 mr-2">|</span>
           <span>{formattedDate || '...'}</span> 
         </div>
       </CardContent>
