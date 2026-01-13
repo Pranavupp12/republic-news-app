@@ -2,8 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { PaginationControls } from "@/components/ui/PaginationControls";
 import type { Metadata } from 'next';
 import { ArticleCard } from '../../_components/ArticleCard'; 
-import { FeaturedArticleCard } from '../../_components/FeaturedArticleCard'; // Import the horizontal card
-import { Separator } from "@/components/ui/separator";
+import { FeaturedArticleCard } from '../../_components/FeaturedArticleCard'; 
+import Image from "next/image";
 
 // --- CATEGORY DESCRIPTIONS MAP ---
 const CATEGORY_INFO: Record<string, string> = {
@@ -19,6 +19,25 @@ const CATEGORY_INFO: Record<string, string> = {
   Entertainment: "Movies, music, celebrity buzz, and pop culture trends.",
   US: "National affairs, federal updates, and stories impacting the American public.",
 };
+
+// --- NEW: CATEGORY BANNER IMAGES MAP ---
+// Ensure these files exist in your public/images folder
+const CATEGORY_IMAGES: Record<string, string> = {
+  Technology: "/images/technology.jpg",
+  Travel: "/images/travel.jpg",
+  Sports: "/images/sports.png",
+  Business: "/images/business.jpg",
+  Culture: "/images/culture.jpg",
+  News: "/images/news.png",
+  Politics: "/images/politics.png",
+  Health: "/images/health.jpg",
+  Climate: "/images/climate.jpg",
+  Entertainment: "/images/entertainment.jpg",
+  US: "/images/us.png",
+};
+
+// Fallback image if a specific category image is missing
+const DEFAULT_BANNER = "/images/news-banner.png"; 
 
 interface CategoryPageProps {
   params: Promise<{ categoryName: string }>;
@@ -37,7 +56,7 @@ export async function generateMetadata(props: CategoryPageProps): Promise<Metada
 }
 
 export default async function CategoryPage(props: CategoryPageProps) {
-  const ARTICLES_PER_PAGE = 10; // Increased to 10 as requested
+  const ARTICLES_PER_PAGE = 10; 
 
   const awaitedParams = await props.params;
   const awaitedSearchParams = await props.searchParams;
@@ -49,7 +68,7 @@ export default async function CategoryPage(props: CategoryPageProps) {
   const articles = await prisma.article.findMany({
     take: ARTICLES_PER_PAGE,
     skip: (Number(page) - 1) * ARTICLES_PER_PAGE,
-    where: { category: { has: categoryName } }, // Case sensitive check
+    where: { category: { has: categoryName } }, 
     orderBy: { createdAt: 'desc' },
     include: { author: true },
   });
@@ -60,70 +79,94 @@ export default async function CategoryPage(props: CategoryPageProps) {
 
   const totalPages = Math.ceil(totalArticles / ARTICLES_PER_PAGE);
 
-  // Split logic: First 2 are Hero, Rest are List
-  const heroArticles = articles.slice(0, 2);
-  const listArticles = articles.slice(2);
+  // Split logic: First 3 are Hero, Rest are List
+  const heroArticles = articles.slice(0, 3);
+  const listArticles = articles.slice(3);
 
   const description = CATEGORY_INFO[categoryName] || `Latest news and updates from the ${categoryName} section.`;
+  
+  // Logic to determine which image to show
+  const bannerImage = CATEGORY_IMAGES[categoryName] || DEFAULT_BANNER;
 
   return (
-    <main className="mx-20 lg:mx-40 py-8 md:py-12 px-4 lg:px-0">
+    // 1. REMOVE MARGINS from main so it spans full width
+    <main className="w-full pb-12">
       
-      {/* --- 1. CATEGORY BANNER --- */}
-      <section className="mb-12 text-center max-w-3xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-extrabold font-heading mb-4 text-black">
-          {categoryName}
-        </h1>
-        <div className="w-24 h-1 bg-red-600 mx-auto mb-6" />
-        <p className="text-lg text-muted-foreground leading-relaxed">
-          {description}
-        </p>
+      {/* --- 1. CATEGORY BANNER (Full Width) --- */}
+      <section className="relative mb-12 h-[310px] w-full flex flex-col justify-center items-center text-center overflow-hidden">
+        
+        {/* A. The Banner Image Background */}
+        <Image
+          src={bannerImage} // <--- UPDATED to use dynamic image
+          alt={`${categoryName} banner`}
+          fill
+          priority
+          className="object-cover z-0"
+          sizes="100vw"
+        />
+
+        {/* B. Dark Overlay (Essential for text readability) */}
+        <div className="absolute inset-0 bg-black/50 z-0" />
+
+        {/* C. The Text Content (Must have relative z-index to sit on top) */}
+        <div className="relative z-10 px-4">
+          <h1 className="text-4xl md:text-5xl font-extrabold font-heading mb-4 text-white">
+            {categoryName}
+          </h1>
+          <div className="w-24 h-1 bg-red-600 mx-auto mb-6" />
+          <p className="text-lg text-gray-200 leading-relaxed max-w-2xl mx-auto">
+            {description}
+          </p>
+        </div>
+        
       </section>
 
-      {articles.length === 0 ? (
-        <div className="text-center py-20 bg-muted/30 rounded-lg">
-          <p className="text-muted-foreground text-lg">No articles found in this category yet.</p>
-        </div>
-      ) : (
-        <>
-          {/* --- 2. HERO SECTION (Top 2 Articles) --- */}
-          {/* We use a grid for the first two to make them prominent */}
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            {heroArticles.map((article) => (
-              <ArticleCard key={article.id} article={article} />
-            ))}
-          </section>
-
-          {/* --- 3. LIST SECTION (Rest of Articles) --- */}
-          {listArticles.length > 0 && (
-            <section className="max-w-4xl mx-auto">
-               <div className="flex items-center mb-8">
-                  <h2 className="text-2xl font-bold font-heading mr-4">More in {categoryName}</h2>
-               </div>
-               
-               <div className="space-y-8">
-                 {listArticles.map((article) => (
-                   <div key={article.id}>
-                     {/* Reuse FeaturedArticleCard because it has the horizontal layout you want */}
-                     <FeaturedArticleCard article={article} />
-                   </div>
-                 ))}
-               </div>
+      {/* --- NEW CONTAINER FOR CONTENT (With Margins) --- */}
+      <div className="mx-4 md:mx-20 lg:mx-40 px-4 lg:px-0">
+        
+        {articles.length === 0 ? (
+          <div className="text-center py-20 bg-muted/30 rounded-lg">
+            <p className="text-muted-foreground text-lg">No articles found in this category yet.</p>
+          </div>
+        ) : (
+          <>
+            {/* --- 2. HERO SECTION (Top 3 Articles) --- */}
+            <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {heroArticles.map((article) => (
+                <ArticleCard key={article.id} article={article} />
+              ))}
             </section>
-          )}
 
-          {/* --- 4. PAGINATION --- */}
-          {totalPages > 1 && (
-            <div className="mt-16 flex justify-center">
-              <PaginationControls
-                  totalPages={totalPages}
-                  currentPage={Number(page)}
-                  baseUrl={`/category/${categoryName}`}
-              />
-            </div>
-          )}
-        </>
-      )}
+            {/* --- 3. LIST SECTION (Rest of Articles) --- */}
+            {listArticles.length > 0 && (
+              <section className="max-w-3xl mx-auto">
+                 <div className="flex items-center mb-8">
+                    <h2 className="text-3xl font-semibold font-heading mr-4">More in {categoryName}</h2>
+                 </div>
+                 
+                 <div className="space-y-8">
+                   {listArticles.map((article) => (
+                     <div key={article.id}>
+                       <FeaturedArticleCard article={article} />
+                     </div>
+                   ))}
+                 </div>
+              </section>
+            )}
+
+            {/* --- 4. PAGINATION --- */}
+            {totalPages > 1 && (
+              <div className="mt-16 flex justify-center">
+                <PaginationControls
+                    totalPages={totalPages}
+                    currentPage={Number(page)}
+                    baseUrl={`/category/${categoryName}`}
+                />
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </main>
   );
 }

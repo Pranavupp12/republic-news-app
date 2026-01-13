@@ -39,7 +39,7 @@ export function ArticleCard({ article, priority = false }: ArticleCardProps) {
     : (article.category ? [article.category] : []);
 
   return (
-    <Card className="flex flex-col overflow-hidden rounded-none h-full group">
+    <Card className="flex flex-col overflow-hidden border-none rounded-none h-full group">
       <CardHeader className="p-0 relative">
         <Link href={`/article/${article.slug}`} className="block relative h-60 w-full">
           <Image
