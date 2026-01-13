@@ -49,7 +49,7 @@ export function ArticleCard({ article, priority = false }: ArticleCardProps) {
             style={{ objectFit: "cover" }}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             priority={priority}
-            className="transition-transform duration-500 group-hover:scale-105"
+            className=""
           />
         </Link>
         
@@ -66,7 +66,7 @@ export function ArticleCard({ article, priority = false }: ArticleCardProps) {
         )}
 
         <CardTitle className="text-lg font-bold mb-2 leading-tight">
-          <Link href={`/article/${article.slug}`} className="group-hover:text-red-600 transition-colors">
+          <Link href={`/article/${article.slug}`} className="group-hover:underline decoration-red-500 underline-offset-4 decoration-2">
             {article.title}
           </Link>
         </CardTitle>
@@ -75,8 +75,8 @@ export function ArticleCard({ article, priority = false }: ArticleCardProps) {
           {article.metaDescription}
         </p>
         
-        <div className="text-xs font-medium text-gray-500 mt-auto uppercase tracking-wide border-t pt-3 flex items-center">
-          <span className="text-red-600 font-bold mr-2">{article.author?.name || 'Anonymous'}</span>
+        <div className="text-xs font-medium text-gray-500 mt-auto  tracking-wide border-t pt-3 flex items-center">
+          <span className="text-black font-bold uppercase mr-2">{article.author?.name || 'Anonymous'}</span>
           <span className="text-gray-300 mr-2">|</span>
           <span>{formattedDate || '...'}</span> 
         </div>

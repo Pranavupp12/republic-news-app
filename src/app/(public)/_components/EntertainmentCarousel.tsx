@@ -11,19 +11,27 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { format } from "date-fns-tz";
+import { useState, useEffect } from "react"; // 1. Import hooks
 
 interface EntertainmentCarouselProps {
   articles: (Article & { author: User | null })[];
 }
 
 export function EntertainmentCarousel({ articles }: EntertainmentCarouselProps) {
+  // 2. STATE: Track if mounted
+  const [isMounted, setIsMounted] = useState(false);
+
+  // 3. EFFECT: Set mounted to true after first render
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   if (articles.length === 0) return null;
 
   return (
-    <section className="w-full bg-white border-t border-b border-black py-8 my-8 overflow-hidden">
-      <div className="">
+    <section className="w-full bg-white border-t border-b border-black py-8 my-10 overflow-hidden">
+      <div className="px-4">
         
-        {/* The Carousel */}
         <Carousel
           opts={{
             align: "start",
@@ -31,18 +39,15 @@ export function EntertainmentCarousel({ articles }: EntertainmentCarouselProps) 
           }}
           className="w-full relative group/carousel"
         >
-          {/* UPDATED: Header Section with Title (Left) and Arrows (Right) */}
-          <div className="flex items-center justify-between mb-3">
-            
-            {/* 1. Heading on the Left */}
-            <h2 className="text-3xl font-semibold font-heading text-black">
+          {/* Header Section */}
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold font-heading text-black">
               Entertainment
             </h2>
 
-            {/* 2. Buttons on the Right */}
             <div className="flex gap-2">
-               <CarouselPrevious className="static translate-y-0 bg-black hover:bg-red-600 text-white border-none h-8 w-8" />
-               <CarouselNext className="static translate-y-0 bg-black hover:bg-red-600 text-white border-none h-8 w-8" />
+               <CarouselPrevious className="static translate-y-0 bg-black hover:bg-red-600 text-white border-none h-10 w-10" />
+               <CarouselNext className="static translate-y-0 bg-black hover:bg-red-600 text-white border-none h-10 w-10" />
             </div>
           </div>
 
@@ -69,7 +74,12 @@ export function EntertainmentCarousel({ articles }: EntertainmentCarouselProps) 
                       </h3>
 
                       <div className="flex items-center text-xs text-slate-300 font-medium border-t border-white/20 pt-3">
-                         <span>{format(new Date(article.createdAt), 'MMMM d, yyyy')}</span>
+                         {/* 4. FIX: Only render date if mounted */}
+                         <span>
+                           {isMounted 
+                             ? format(new Date(article.createdAt), 'MMMM d, yyyy') 
+                             : '...'}
+                         </span>
                       </div>
                     </div>
                   </Link>

@@ -99,7 +99,6 @@ export default async function CategoryPage(props: CategoryPageProps) {
             <section className="max-w-4xl mx-auto">
                <div className="flex items-center mb-8">
                   <h2 className="text-2xl font-bold font-heading mr-4">More in {categoryName}</h2>
-                  <Separator className="flex-grow" />
                </div>
                
                <div className="space-y-8">
@@ -107,7 +106,6 @@ export default async function CategoryPage(props: CategoryPageProps) {
                    <div key={article.id}>
                      {/* Reuse FeaturedArticleCard because it has the horizontal layout you want */}
                      <FeaturedArticleCard article={article} />
-                     <Separator className="mt-8" />
                    </div>
                  ))}
                </div>
