@@ -20,25 +20,6 @@ const CATEGORY_INFO: Record<string, string> = {
   US: "National affairs, federal updates, and stories impacting the American public.",
 };
 
-// --- NEW: CATEGORY BANNER IMAGES MAP ---
-// Ensure these files exist in your public/images folder
-const CATEGORY_IMAGES: Record<string, string> = {
-  Technology: "/images/technology.jpg",
-  Travel: "/images/travel.jpg",
-  Sports: "/images/sports.png",
-  Business: "/images/business.jpg",
-  Culture: "/images/culture.jpg",
-  News: "/images/news.png",
-  Politics: "/images/politics.png",
-  Health: "/images/health.jpg",
-  Climate: "/images/climate.jpg",
-  Entertainment: "/images/entertainment.jpg",
-  US: "/images/us.png",
-};
-
-// Fallback image if a specific category image is missing
-const DEFAULT_BANNER = "/images/news-banner.png"; 
-
 interface CategoryPageProps {
   params: Promise<{ categoryName: string }>;
   searchParams: Promise<{ page?: string }>;
@@ -84,37 +65,33 @@ export default async function CategoryPage(props: CategoryPageProps) {
   const listArticles = articles.slice(3);
 
   const description = CATEGORY_INFO[categoryName] || `Latest news and updates from the ${categoryName} section.`;
-  
-  // Logic to determine which image to show
-  const bannerImage = CATEGORY_IMAGES[categoryName] || DEFAULT_BANNER;
 
   return (
     // 1. REMOVE MARGINS from main so it spans full width
     <main className="w-full pb-12">
       
       {/* --- 1. CATEGORY BANNER (Full Width) --- */}
-      <section className="relative mb-12 h-[310px] w-full flex flex-col justify-center items-center text-center overflow-hidden">
+      <section className="relative mb-12 h-[350px] w-full flex flex-col justify-center items-center text-center overflow-hidden">
         
         {/* A. The Banner Image Background */}
         <Image
-          src={bannerImage} // <--- UPDATED to use dynamic image
+          // You can make this dynamic based on categoryName if you have specific images
+          src="/images/news-banner.png" 
           alt={`${categoryName} banner`}
           fill
           priority
           className="object-cover z-0"
           sizes="100vw"
         />
-
-        {/* B. Dark Overlay (Essential for text readability) */}
-        <div className="absolute inset-0 bg-black/50 z-0" />
+        
 
         {/* C. The Text Content (Must have relative z-index to sit on top) */}
         <div className="relative z-10 px-4">
-          <h1 className="text-4xl md:text-5xl font-extrabold font-heading mb-4 text-white">
+          <h1 className="text-4xl md:text-6xl lg:text-8xl font-bold font-heading mb-4 text-white">
             {categoryName}
           </h1>
-          <div className="w-24 h-1 bg-red-600 mx-auto mb-6" />
-          <p className="text-lg text-gray-200 leading-relaxed max-w-2xl mx-auto">
+          <div className="w-23 md:w-40 lg:w-60 h-1 bg-red-600 mx-auto mb-6" />
+          <p className="text-lg font-semibold text-gray-200 leading-relaxed max-w-2xl mx-auto">
             {description}
           </p>
         </div>
@@ -122,6 +99,7 @@ export default async function CategoryPage(props: CategoryPageProps) {
       </section>
 
       {/* --- NEW CONTAINER FOR CONTENT (With Margins) --- */}
+      {/* Applied your requested mx-20 lg:mx-40 here */}
       <div className="mx-4 md:mx-20 lg:mx-40 px-4 lg:px-0">
         
         {articles.length === 0 ? (
@@ -131,7 +109,7 @@ export default async function CategoryPage(props: CategoryPageProps) {
         ) : (
           <>
             {/* --- 2. HERO SECTION (Top 3 Articles) --- */}
-            <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <section className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
               {heroArticles.map((article) => (
                 <ArticleCard key={article.id} article={article} />
               ))}
@@ -141,7 +119,7 @@ export default async function CategoryPage(props: CategoryPageProps) {
             {listArticles.length > 0 && (
               <section className="max-w-3xl mx-auto">
                  <div className="flex items-center mb-8">
-                    <h2 className="text-3xl font-semibold font-heading mr-4">More in {categoryName}</h2>
+                    <h2 className="text-2xl font-bold font-heading mr-4">More in {categoryName}</h2>
                  </div>
                  
                  <div className="space-y-8">

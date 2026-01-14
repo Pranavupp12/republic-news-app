@@ -11,10 +11,8 @@ import { createArticle } from "@/actions/newsActions";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Loader2 } from 'lucide-react';
 import { RichTextEditor } from './RichTextEditor';
-import { Checkbox } from "@/components/ui/checkbox"; // 1. Import Checkbox
-
-// You can use your constant or this hardcoded list
-const CATEGORY_LIST = ["US", "World", "Politics", "Business", "Tech", "Science", "Health", "Sports", "Entertainment"];
+import { Checkbox } from "@/components/ui/checkbox";
+import { ARTICLE_CATEGORIES } from "@/lib/constants"; // 1. Import from constants
 
 function slugify(text: string) {
   return text.toString().toLowerCase().trim()
@@ -32,7 +30,6 @@ export function AddNewsForm() {
   const [slug, setSlug] = useState('');
   const [content, setContent] = useState('');
   
-  // 2. CHANGE STATE TO ARRAY
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,7 +38,6 @@ export function AddNewsForm() {
     setSlug(slugify(newTitle)); 
   };
 
-  // 3. HANDLE CHECKBOX TOGGLES
   const handleCategoryToggle = (cat: string) => {
     setSelectedCategories((prev) => 
       prev.includes(cat) 
@@ -56,9 +52,7 @@ export function AddNewsForm() {
     const form = event.currentTarget;
     const formData = new FormData(form);
 
-    // 4. MANUALLY SET CONTENT ONLY
-    // We do NOT need to manually set 'category' here anymore.
-    // Because the checkboxes have name="category", formData already includes all selected values!
+    // Manually set content
     formData.set('content', content); 
 
     const result = await createArticle(formData);
@@ -67,11 +61,11 @@ export function AddNewsForm() {
       toast.success("Success", { description: "Article created successfully." });
       form.reset();
       
-      // 5. RESET ALL STATES
+      // Reset states
       setTitle('');
       setSlug('');
       setContent('');
-      setSelectedCategories([]); // Reset selection
+      setSelectedCategories([]); 
       setImageSource('url');
     } else {
       toast.error("Error", { description: result.error || "Failed to create article." });
@@ -97,15 +91,16 @@ export function AddNewsForm() {
             <p className="text-xs text-muted-foreground">e.g., /article/{slug}</p>
           </div>
 
-          {/* 6. REPLACED SELECT WITH CHECKBOX GRID */}
+          {/* Categories Grid */}
           <div className="space-y-3">
             <Label>Categories (Select at least one)</Label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 border p-4 rounded-md">
-              {CATEGORY_LIST.map((cat) => (
+              {/* 2. Map over ARTICLE_CATEGORIES instead of hardcoded list */}
+              {ARTICLE_CATEGORIES.map((cat) => (
                 <div key={cat} className="flex items-center space-x-2">
                   <Checkbox 
                     id={`cat-${cat}`} 
-                    name="category" // MUST match what getAll('category') looks for
+                    name="category" 
                     value={cat}
                     checked={selectedCategories.includes(cat)}
                     onCheckedChange={() => handleCategoryToggle(cat)}
@@ -139,7 +134,7 @@ export function AddNewsForm() {
             <div className="space-y-2"><Label htmlFor="imageFile">Upload Image</Label><Input id="imageFile" name="imageFile" type="file" accept="image/*" /></div>
           )}
 
-          {/* SEO Fields ... */}
+          {/* SEO Fields */}
           <div className="space-y-2">
             <Label htmlFor="metaTitle">Meta Title (SEO)</Label>
             <Input id="metaTitle" name="metaTitle" placeholder="Optional: SEO-friendly title" />
@@ -155,6 +150,10 @@ export function AddNewsForm() {
 
           <div className="space-y-2 flex flex-col flex-grow">
             <Label>Content</Label>
+            {/* Optional: If you want the Editor heading to update based on selection, 
+              you can pass `category={selectedCategories[0]}` here.
+              For now, keeping it as requested.
+            */}
             <RichTextEditor
               value={content}
               onChange={setContent}
