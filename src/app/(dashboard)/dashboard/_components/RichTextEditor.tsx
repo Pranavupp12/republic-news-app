@@ -42,27 +42,27 @@ const MenuBar = ({ editor, addImage }: { editor: Editor | null, addImage: () => 
   return (
     <div className="border rounded-t-md p-2 flex flex-wrap gap-2 sticky top-0 bg-background z-10 border-b-0">
       {/* --- Heading Buttons --- */}
-      <Button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} variant={editor.isActive('heading', { level: 1 }) ? 'default' : 'outline'} size="sm">
+      <Button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} variant={editor.isActive('heading', { level: 1 }) ? 'secondary' : 'outline'} size="sm">
         <Heading1 className="h-4 w-4" />
       </Button>
-      <Button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} variant={editor.isActive('heading', { level: 2 }) ? 'default' : 'outline'} size="sm">
+      <Button type="button"  onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} variant={editor.isActive('heading', { level: 2 }) ? 'secondary' : 'outline'} size="sm">
         <Heading2 className="h-4 w-4" />
       </Button>
-      <Button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} variant={editor.isActive('heading', { level: 3 }) ? 'default' : 'outline'} size="sm">
+      <Button type="button" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} variant={editor.isActive('heading', { level: 3 }) ? 'secondary' : 'outline'} size="sm">
         <Heading3 className="h-4 w-4" />
       </Button>
 
       {/* --- Style Buttons --- */}
-      <Button type="button" onClick={() => editor.chain().focus().toggleBold().run()} variant={editor.isActive('bold') ? 'default' : 'outline'} size="sm">
+      <Button type="button" onClick={() => editor.chain().focus().toggleBold().run()} variant={editor.isActive('bold') ? 'secondary' : 'outline'} size="sm">
         <Bold className="h-4 w-4" />
       </Button>
-      <Button type="button" onClick={() => editor.chain().focus().toggleItalic().run()} variant={editor.isActive('italic') ? 'default' : 'outline'} size="sm">
+      <Button type="button" onClick={() => editor.chain().focus().toggleItalic().run()} variant={editor.isActive('italic') ? 'secondary' : 'outline'} size="sm">
         <Italic className="h-4 w-4" />
       </Button>
-      <Button type="button" onClick={() => editor.chain().focus().toggleUnderline().run()} variant={editor.isActive('underline') ? 'default' : 'outline'} size="sm">
+      <Button type="button" onClick={() => editor.chain().focus().toggleUnderline().run()} variant={editor.isActive('underline') ? 'secondary' : 'outline'} size="sm">
         <Underline className="h-4 w-4" />
       </Button>
-      <Button type="button" onClick={setLink} variant={editor.isActive('link') ? 'default' : 'outline'} size="sm">
+      <Button type="button" onClick={setLink} variant={editor.isActive('link') ? 'secondary' : 'outline'} size="sm">
         <Link className="h-4 w-4" />
       </Button>
 
@@ -72,24 +72,24 @@ const MenuBar = ({ editor, addImage }: { editor: Editor | null, addImage: () => 
       </Button>
 
       {/* --- Align Buttons --- */}
-      <Button type="button" onClick={() => editor.chain().focus().setTextAlign('left').run()} variant={editor.isActive({ textAlign: 'left' }) ? 'default' : 'outline'} size="sm">
+      <Button type="button" onClick={() => editor.chain().focus().setTextAlign('left').run()} variant={editor.isActive({ textAlign: 'left' }) ? 'secondary' : 'outline'} size="sm">
         <AlignLeft className="h-4 w-4" />
       </Button>
-      <Button type="button" onClick={() => editor.chain().focus().setTextAlign('center').run()} variant={editor.isActive({ textAlign: 'center' }) ? 'default' : 'outline'} size="sm">
+      <Button type="button" onClick={() => editor.chain().focus().setTextAlign('center').run()} variant={editor.isActive({ textAlign: 'center' }) ? 'secondary' : 'outline'} size="sm">
         <AlignCenter className="h-4 w-4" />
       </Button>
-      <Button type="button" onClick={() => editor.chain().focus().setTextAlign('right').run()} variant={editor.isActive({ textAlign: 'right' }) ? 'default' : 'outline'} size="sm">
+      <Button type="button" onClick={() => editor.chain().focus().setTextAlign('right').run()} variant={editor.isActive({ textAlign: 'right' }) ? 'secondary' : 'outline'} size="sm">
         <AlignRight className="h-4 w-4" />
       </Button>
-      <Button type="button" onClick={() => editor.chain().focus().setTextAlign('justify').run()} variant={editor.isActive({ textAlign: 'justify' }) ? 'default' : 'outline'} size="sm">
+      <Button type="button" onClick={() => editor.chain().focus().setTextAlign('justify').run()} variant={editor.isActive({ textAlign: 'justify' }) ? 'secondary' : 'outline'} size="sm">
         <AlignJustify className="h-4 w-4" />
       </Button>
 
       {/* --- List Buttons --- */}
-      <Button type="button" onClick={() => editor.chain().focus().toggleBulletList().run()} variant={editor.isActive('bulletList') ? 'default' : 'outline'} size="sm">
+      <Button type="button" onClick={() => editor.chain().focus().toggleBulletList().run()} variant={editor.isActive('bulletList') ? 'secondary' : 'outline'} size="sm">
         <List className="h-4 w-4" />
       </Button>
-      <Button type="button" onClick={() => editor.chain().focus().toggleOrderedList().run()} variant={editor.isActive('orderedList') ? 'default' : 'outline'} size="sm">
+      <Button type="button" onClick={() => editor.chain().focus().toggleOrderedList().run()} variant={editor.isActive('orderedList') ? 'secondary' : 'outline'} size="sm">
         <ListOrdered className="h-4 w-4" />
       </Button>
     </div>
