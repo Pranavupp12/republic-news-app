@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-// Removed Badge import as it is no longer used
 import type { Metadata } from 'next';
 import { format } from 'date-fns-tz';
 import Script from 'next/script'; 

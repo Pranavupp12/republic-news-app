@@ -56,20 +56,35 @@ export function AddNewsForm() {
     const form = event.currentTarget;
     const formData = new FormData(form);
 
-    // Ensure our state values are submitted
+    // 1. Manually set Content & SEO (You already have this)
     formData.set('content', content);
     formData.set('metaTitle', metaTitle);
     formData.set('metaDescription', metaDesc);
     formData.set('metaKeywords', metaKeywords);
     formData.set('focusKeyword', focusKeyword);
 
+    // 2. FIX: Manually set Image Source (React State -> FormData)
+    // The server needs to know if it's 'url' or 'upload' to check the right field
+    formData.set('imageSource', imageSource); 
+
+    // 3. FIX: Manually append Categories (React State -> FormData)
+    // Shadcn checkboxes are not native inputs, so FormData ignores them by default.
+    // We loop through the array and append each one.
+    selectedCategories.forEach((cat) => {
+      formData.append('category', cat);
+    });
+
     const result = await createArticle(formData);
 
     if (result.success) {
       toast.success("Success", { description: "Article created successfully." });
       form.reset();
-      setTitle(''); setSlug(''); setContent(''); setSelectedCategories([]);
-      // Reset SEO fields
+      
+      // Reset all states
+      setTitle('');
+      setSlug('');
+      setContent('');
+      setSelectedCategories([]);
       setFocusKeyword(''); setMetaTitle(''); setMetaDesc(''); setMetaKeywords('');
       setImageSource('url');
     } else {
