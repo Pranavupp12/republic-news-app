@@ -52,7 +52,7 @@ export default async function DashboardPage(props: DashboardPageProps) {
     whereClause.createdAt = { gte: today };
   }
   if (categoryFilter) {
-    whereClause.category = categoryFilter;
+    whereClause.category = { has: categoryFilter };
   }
 
   const storyWhereClause: Prisma.WebStoryWhereInput = {};
