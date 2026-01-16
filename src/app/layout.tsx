@@ -3,6 +3,7 @@ import { Inter, Calistoga } from "next/font/google"; // <-- 1. Import Heading Fo
 import "./globals.css";
 import AuthProvider from "./context/AuthProvider";
 import { Toaster } from "sonner";
+import Script from "next/script";
 
 // --- OPTIMIZE FONTS ---
 const inter = Inter({
@@ -54,6 +55,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       {/* 3. Add both font variables to the body */}
       <body className={`${inter.variable} ${calistoga.variable} font-sans antialiased`}>
+        <Script
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-NQ8YSKL9YG"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-NQ8YSKL9YG');
+          `}
+        </Script>
         <AuthProvider>
           {children}
           <Toaster />
