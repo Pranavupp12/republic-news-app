@@ -1,8 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // 1. PERFORMANCE: Ensure minification is active
-  swcMinify: true,
 
   // 2. IMAGES
   images: {
@@ -61,17 +59,6 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // 5. WEBPACK OVERRIDE (The "Nuclear Option" to block polyfills)
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      if (config.resolve && config.resolve.alias) {
-        // Forcefully resolve bloat libraries to false
-        config.resolve.alias['core-js'] = false;
-        config.resolve.alias['regenerator-runtime'] = false;
-      }
-    }
-    return config;
-  },
 };
 
 export default nextConfig;

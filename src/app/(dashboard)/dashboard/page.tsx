@@ -12,7 +12,6 @@ import { WebStoryManager } from "./_components/WebStoryManager";
 import Link from "next/link";
 import { Suspense } from "react";
 import DashboardLoading from "./loading";
-// 1. IMPORT NOTIFICATION COMPONENTS
 import { getNotificationHistory } from "@/actions/notificationActions";
 import { CreateDigestForm } from "./notifications/_components/CreateDigestForm";
 import { NotificationHistoryTable } from "./notifications/_components/NotificationHistoryTable";
@@ -25,9 +24,10 @@ interface DashboardPageProps {
     filter?: 'all' | 'today';
     storyFilter?: 'all' | 'today';
     category?: string;
+    search?: string; // <--- 1. Add Search Param
     page?: string;
     storyPage?: string;
-    tab?: 'manage' | 'stories' | 'notifications' | 'stats'; // Added 'notifications'
+    tab?: 'manage' | 'stories' | 'notifications' | 'stats'; 
   }>
 }
 
@@ -39,22 +39,36 @@ export default async function DashboardPage(props: DashboardPageProps) {
   // --- 1. PREPARE PARAMETERS ---
   const articleFilter = search.filter || 'all';
   const categoryFilter = search.category;
+  const searchQuery = search.search || ''; // <--- 2. Get Search Query
   const articlePage = Number(search.page ?? '1');
 
   const storyFilter = search.storyFilter || 'all';
   const storyPage = Number(search.storyPage ?? '1');
 
-  // --- 2. BUILD QUERIES ---
+  // --- 3. BUILD QUERIES ---
   const whereClause: Prisma.ArticleWhereInput = {};
+
+  // A. Filter by Today
   if (articleFilter === 'today') {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     whereClause.createdAt = { gte: today };
   }
+
+  // B. Filter by Category
   if (categoryFilter) {
     whereClause.category = { has: categoryFilter };
   }
 
+  // C. Filter by Search Title (NEW)
+  if (searchQuery) {
+    whereClause.title = {
+      contains: searchQuery,
+      mode: 'insensitive', // Case-insensitive search
+    };
+  }
+
+  // ... (Rest of WebStory logic remains same)
   const storyWhereClause: Prisma.WebStoryWhereInput = {};
   if (storyFilter === 'today') {
     const today = new Date();
@@ -62,9 +76,7 @@ export default async function DashboardPage(props: DashboardPageProps) {
     storyWhereClause.createdAt = { gte: today };
   }
 
-  // --- 3. INITIATE PROMISES ---
-  
-  // A. Manage Tab Promises
+  // --- 4. INITIATE PROMISES ---
   const articlesPromise = prisma.article.findMany({
     take: ARTICLES_PER_PAGE,
     skip: (articlePage - 1) * ARTICLES_PER_PAGE,
@@ -73,13 +85,15 @@ export default async function DashboardPage(props: DashboardPageProps) {
     include: { author: true },
   });
   const totalListArticlesPromise = prisma.article.count({ where: whereClause });
+  
+  // Get Raw Categories to flatten later
   const categoriesResultPromise = prisma.article.findMany({
     select: { category: true },
     distinct: ['category'],
   });
   const trendingCountPromise = prisma.article.count({ where: { isTrending: true } });
 
-  // B. Stories Tab Promises
+  // ... (Rest of promises remain same)
   const webStoriesPromise = prisma.webStory.findMany({
     take: ARTICLES_PER_PAGE,
     skip: (storyPage - 1) * ARTICLES_PER_PAGE,
@@ -89,15 +103,12 @@ export default async function DashboardPage(props: DashboardPageProps) {
   });
   const totalWebStoriesPromise = prisma.webStory.count({ where: storyWhereClause });
 
-  // C. Notifications Tab Promises
-  // We fetch recent articles for the digest selector
   const notificationArticlesPromise = prisma.article.findMany({
     take: 20,
     orderBy: { createdAt: 'desc' },
     select: { id: true, title: true, createdAt: true }
   });
 
-  // D. Stats Tab Promises
   const totalArticlesPromise = prisma.article.count();
   const featuredCountPromise = prisma.article.count({ where: { isFeatured: true } });
   const currentlyFeaturedPromise = prisma.article.findMany({ where: { isFeatured: true }, select: { title: true, category: true }, take: 7 });
@@ -113,7 +124,6 @@ export default async function DashboardPage(props: DashboardPageProps) {
       </section>
 
       <Tabs value={activeTab} className="w-full">
-        {/* ADDED NOTIFICATIONS TAB TRIGGER */}
         <TabsList className="grid w-fit grid-cols-4">
           <TabsTrigger value="manage" asChild><Link href="/dashboard?tab=manage">Manage Articles</Link></TabsTrigger>
           <TabsTrigger value="stories" asChild><Link href="/dashboard?tab=stories">Web Stories</Link></TabsTrigger>
@@ -122,7 +132,8 @@ export default async function DashboardPage(props: DashboardPageProps) {
         </TabsList>
 
         <TabsContent value="manage" className="mt-6">
-          <Suspense key={articlePage + articleFilter + categoryFilter} fallback={<DashboardLoading />}>
+          {/* Add searchQuery to key to force suspense reload on search */}
+          <Suspense fallback={<DashboardLoading />}>
             <ManageTabContent 
               articlesPromise={articlesPromise}
               countPromise={totalListArticlesPromise}
@@ -135,7 +146,7 @@ export default async function DashboardPage(props: DashboardPageProps) {
         </TabsContent>
 
         <TabsContent value="stories" className="mt-6">
-          <Suspense key={storyPage + storyFilter} fallback={<DashboardLoading />}>
+          <Suspense fallback={<DashboardLoading />}>
             <StoriesTabContent 
               storiesPromise={webStoriesPromise}
               countPromise={totalWebStoriesPromise}
@@ -145,7 +156,6 @@ export default async function DashboardPage(props: DashboardPageProps) {
           </Suspense>
         </TabsContent>
 
-        {/* --- ADDED NOTIFICATIONS TAB CONTENT --- */}
         <TabsContent value="notifications" className="mt-6">
           <Suspense fallback={<DashboardLoading />}>
             <NotificationsTabContent 
@@ -178,14 +188,22 @@ export default async function DashboardPage(props: DashboardPageProps) {
 async function ManageTabContent({ articlesPromise, countPromise, categoriesPromise, trendingCountPromise, currentPage, isTodayFilterActive }: any) {
   const [articles, totalArticles, categoriesResult, trendingCount] = await Promise.all([articlesPromise, countPromise, categoriesPromise, trendingCountPromise]);
   const totalPages = Math.ceil(totalArticles / ARTICLES_PER_PAGE);
-  const allCategories = categoriesResult.map((item: any) => item.category);
+  
+  // FIX: Flatten the categories correctly
+  // categoriesResult = [{ category: ['Politics'] }, { category: ['Sports', 'US'] }]
+  // flatMap -> ['Politics', 'Sports', 'US']
+  // Set -> Removes duplicates
+  const allCategories = Array.from(new Set(
+    categoriesResult.flatMap((item: any) => item.category)
+  )) as string[];
 
   return (
     <div className="grid grid-cols-1 gap-8">
       <section><AddNewsForm /></section>
       <section id="existing-articles">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
           <h2 className="text-2xl font-semibold font-heading">Existing Articles</h2>
+          {/* Filters now include search */}
           <FilterButtons categories={allCategories} scrollTargetId="existing-articles" />
         </div>
         <NewsDataTable
@@ -205,60 +223,59 @@ async function ManageTabContent({ articlesPromise, countPromise, categoriesPromi
   );
 }
 
+// ... (Rest of sub-components StoriesTabContent, NotificationsTabContent, StatsTabContent remain unchanged)
 async function StoriesTabContent({ storiesPromise, countPromise, currentPage, storyFilter }: any) {
-  const [webStories, totalWebStories] = await Promise.all([storiesPromise, countPromise]);
-  const totalPages = Math.ceil(totalWebStories / ARTICLES_PER_PAGE);
-
-  return (
-    <WebStoryManager
-      stories={webStories}
-      currentPage={currentPage}
-      articlesPerPage={ARTICLES_PER_PAGE}
-      totalPages={totalPages}
-      storyFilter={storyFilter} 
-    />
-  );
+    const [webStories, totalWebStories] = await Promise.all([storiesPromise, countPromise]);
+    const totalPages = Math.ceil(totalWebStories / ARTICLES_PER_PAGE);
+  
+    return (
+      <WebStoryManager
+        stories={webStories}
+        currentPage={currentPage}
+        articlesPerPage={ARTICLES_PER_PAGE}
+        totalPages={totalPages}
+        storyFilter={storyFilter} 
+      />
+    );
 }
 
-// --- NEW SUB-COMPONENT FOR NOTIFICATIONS ---
 async function NotificationsTabContent({ articlesPromise }: any) {
-  const [recentArticles, historyResult] = await Promise.all([
-    articlesPromise,
-    getNotificationHistory() // We fetch history directly here as it's not paginated yet
-  ]);
+    const [recentArticles, historyResult] = await Promise.all([
+      articlesPromise,
+      getNotificationHistory() 
+    ]);
+    const logs = historyResult.success ? historyResult.logs : [];
   
-  const logs = historyResult.success ? historyResult.logs : [];
-
-  return (
-    <div className="grid grid-cols-1 gap-8">
-      <section>
-        <div className="mb-4">
-            <h2 className="text-2xl font-semibold font-heading">Compose Digest</h2>
-            <p className="text-sm text-muted-foreground">Select articles to send a summary notification to all subscribers.</p>
-        </div>
-        <CreateDigestForm articles={recentArticles} />
-      </section>
-
-      <section>
-        <Card className="border-none">
-            <CardHeader><CardTitle>Sent History</CardTitle></CardHeader>
-            <CardContent>
-                <NotificationHistoryTable logs={logs as any} />
-            </CardContent>
-        </Card>
-      </section>
-    </div>
-  );
+    return (
+      <div className="grid grid-cols-1 gap-8">
+        <section>
+          <div className="mb-4">
+              <h2 className="text-2xl font-semibold font-heading">Compose Digest</h2>
+              <p className="text-sm text-muted-foreground">Select articles to send a summary notification to all subscribers.</p>
+          </div>
+          <CreateDigestForm articles={recentArticles} />
+        </section>
+  
+        <section>
+          <Card className="border-none">
+              <CardHeader><CardTitle>Sent History</CardTitle></CardHeader>
+              <CardContent>
+                  <NotificationHistoryTable logs={logs as any} />
+              </CardContent>
+          </Card>
+        </section>
+      </div>
+    );
 }
 
 async function StatsTabContent({
-  totalArticlesPromise, featuredCountPromise, trendingCountPromise, currentlyFeaturedPromise, currentlyTrendingPromise, articlesPerCategoryPromise
-}: any) {
-  const [
-    totalArticles, featuredCount, trendingCount, currentlyFeatured, currentlyTrending, articlesPerCategory,
-  ] = await Promise.all([
     totalArticlesPromise, featuredCountPromise, trendingCountPromise, currentlyFeaturedPromise, currentlyTrendingPromise, articlesPerCategoryPromise
-  ]);
-  const stats = { totalArticles, featuredCount, trendingCount, currentlyFeatured, currentlyTrending, articlesPerCategory };
-  return <StatsCard stats={stats} />;
+  }: any) {
+    const [
+      totalArticles, featuredCount, trendingCount, currentlyFeatured, currentlyTrending, articlesPerCategory,
+    ] = await Promise.all([
+      totalArticlesPromise, featuredCountPromise, trendingCountPromise, currentlyFeaturedPromise, currentlyTrendingPromise, articlesPerCategoryPromise
+    ]);
+    const stats = { totalArticles, featuredCount, trendingCount, currentlyFeatured, currentlyTrending, articlesPerCategory };
+    return <StatsCard stats={stats} />;
 }

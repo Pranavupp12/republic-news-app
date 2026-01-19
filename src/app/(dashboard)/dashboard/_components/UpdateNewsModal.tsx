@@ -20,7 +20,7 @@ import type { Article } from '@prisma/client';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox"; 
 import { RichTextEditor } from './RichTextEditor'; 
-import { Loader2 } from "lucide-react";
+import { Loader2, Link as LinkIcon } from "lucide-react";
 import { ARTICLE_CATEGORIES } from '@/lib/constants';
 
 function slugify(text: string) {
@@ -46,7 +46,7 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
   const [content, setContent] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-  // 1. ADDED FOCUS KEYWORD STATE
+  // Focus Keyword State
   const [focusKeyword, setFocusKeyword] = useState('');
 
   // Sync prop to local state when the modal opens/article changes
@@ -56,7 +56,6 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
       setSlug(article.slug || '');
       setContent(article.content);
       setImageSource('url');
-      // 2. LOAD FOCUS KEYWORD
       setFocusKeyword(article.focusKeyword || '');
       
       if (Array.isArray(article.category)) {
@@ -89,12 +88,8 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
     event.preventDefault();
     setIsSubmitting(true);
     
-    // FormData automatically captures all inputs with 'name' attributes
     const formData = new FormData(event.currentTarget);
     formData.set('content', content); 
-    
-    // The native checkboxes will be collected as multiple 'category' entries by the browser
-    // The native 'focusKeyword' input will be collected automatically because it has name="focusKeyword"
 
     const result = await updateArticle(article.id, formData);
 
@@ -110,6 +105,9 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
     }
     setIsSubmitting(false);
   };
+
+  // Calculate Preview URL
+  const previewUrl = `https://www.republicnews.us/article/${slug || 'your-slug-here'}`;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -132,7 +130,14 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
             <div className="space-y-2">
               <Label htmlFor="slug">Blog URL Slug</Label>
               <Input id="slug" name="slug" value={slug} onChange={(e) => setSlug(e.target.value)} required />
-              <p className="text-xs text-muted-foreground">e.g., /article/{slug}</p>
+              
+              {/* URL Preview Section */}
+              <div className="flex items-center gap-2 text-xs text-muted-foreground bg-slate-50 dark:bg-slate-900 p-2 rounded border border-dashed">
+                  <LinkIcon className="w-3 h-3 flex-shrink-0" />
+                  <span className="truncate">
+                      Preview: <span className="text-blue-600 dark:text-blue-400">{previewUrl}</span>
+                  </span>
+              </div>
             </div>
 
             {/* Categories */}
@@ -196,7 +201,7 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
               </div>
             )}
 
-            {/* 3. ADDED FOCUS KEYWORD FIELD */}
+            {/* Focus Keyword Field */}
             <div className="space-y-2 pt-4 border-t mt-4">
                 <Label htmlFor="focusKeyword" className="text-blue-600 font-semibold">Focus Keyword</Label>
                 <Input 

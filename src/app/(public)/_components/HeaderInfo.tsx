@@ -7,9 +7,6 @@ export function HeaderInfo() {
   const [location, setLocation] = useState('United States'); // Default location
   const [temperature, setTemperature] = useState<number | null>(null);
   
-  // We can keep the state logic in case you want it back later, 
-  // but it won't be displayed.
-  const [weatherIcon, setWeatherIcon] = useState<string | null>(null); 
 
   useEffect(() => {
     // Format the date once the component mounts on the client
@@ -41,10 +38,6 @@ export function HeaderInfo() {
           setTemperature(Math.round(data.main.temp));
           setLocation(data.name);
           
-          if (data.weather && data.weather[0]) {
-            console.log("Weather icon code received:", data.weather[0].icon);
-            setWeatherIcon(data.weather[0].icon);
-          }
         }
       } catch (error) {
         console.error("Failed to fetch weather data:", error);

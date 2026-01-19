@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { createArticle } from "@/actions/newsActions";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Loader2 } from 'lucide-react';
+import { Loader2,Link as LinkIcon } from 'lucide-react';
 import { RichTextEditor } from './RichTextEditor';
 import { Checkbox } from "@/components/ui/checkbox";
 import { ARTICLE_CATEGORIES } from "@/lib/constants";
@@ -90,6 +90,8 @@ export function AddNewsForm() {
     setIsSubmitting(false);
   };
 
+  const previewUrl = `https://www.republicnews.us/article/${slug || 'your-slug-here'}`;
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* LEFT COLUMN: MAIN FORM (Takes up 2/3 space) */}
@@ -106,6 +108,12 @@ export function AddNewsForm() {
                 <Label htmlFor="slug">Slug</Label>
                 <Input id="slug" name="slug" value={slug} onChange={(e) => setSlug(e.target.value)} required />
               </div>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground bg-slate-50 dark:bg-slate-900 p-2 rounded border border-dashed">
+                    <LinkIcon className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate">
+                        Preview: <span className="text-blue-600 dark:text-blue-400">{previewUrl}</span>
+                    </span>
+                </div>
 
               {/* Categories */}
               <div className="space-y-3">

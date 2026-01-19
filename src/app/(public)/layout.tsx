@@ -42,8 +42,8 @@ export default function PublicLayout({
                 alt="Republic News Logo"
                 width={250}
                 height={50}
-                priority={true}
                 className="object-contain"
+                unoptimized
               />
             </Link>
           </div>
