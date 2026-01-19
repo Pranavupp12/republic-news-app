@@ -38,7 +38,7 @@ export default function PublicLayout({
           <div className="flex justify-center items-center w-full">
             <Link href="/" className="flex items-center">
               <Image
-                src="/logo/rn-logo.png"
+                src="/logo/rn-logo.svg"
                 alt="Republic News Logo"
                 width={250}
                 height={50}

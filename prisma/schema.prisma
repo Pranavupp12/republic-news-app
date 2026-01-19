@@ -30,6 +30,7 @@ model Article {
   isFeatured Boolean  @default(false)
   isTrending    Boolean  @default(false)    
   trendingTopic String?  
+  focusKeyword  String? 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   author    User     @relation(fields: [authorId], references: [id])

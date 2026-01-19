@@ -1,16 +1,19 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-   images: {
+  // 1. PERFORMANCE: Ensure minification is active
+  swcMinify: true,
+
+  // 2. IMAGES
+  images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
         port: '',
-        pathname: '/**', // This allows all paths under the hostname
+        pathname: '/**',
       },
-      // Add this new pattern for BBC images
       {
         protocol: 'https',
         hostname: 'ichef.bbci.co.uk',
@@ -29,36 +32,46 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/img/wn/**',
       },
-       {
+      {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
         port: '',
         pathname: '/**',
       },
-       {
+      {
         protocol: 'http',
         hostname: 'googleusercontent.com',
         pathname: '/**',
       },
     ],
   },
+
+  // 3. EXPERIMENTAL
   experimental: {
     serverActions: {
-      bodySizeLimit: '10mb', // Increase the limit to 10 megabytes
+      bodySizeLimit: '10mb',
     },
   },
+
+  // 4. LINTING & TYPESCRIPT
   eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
   typescript: {
-    // !! WARN !!
-    // Dangerously allow production builds to successfully complete even if
-    // your project has type errors.
     ignoreBuildErrors: true,
   },
-  
+
+  // 5. WEBPACK OVERRIDE (The "Nuclear Option" to block polyfills)
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      if (config.resolve && config.resolve.alias) {
+        // Forcefully resolve bloat libraries to false
+        config.resolve.alias['core-js'] = false;
+        config.resolve.alias['regenerator-runtime'] = false;
+      }
+    }
+    return config;
+  },
 };
 
 export default nextConfig;

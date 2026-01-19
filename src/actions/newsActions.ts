@@ -47,6 +47,7 @@ export async function createArticle(formData: FormData) {
     const metaTitle = formData.get('metaTitle') as string | null;
     const metaDescription = formData.get('metaDescription') as string | null;
     const metaKeywords = formData.get('metaKeywords') as string | null;
+    const focusKeyword = formData.get('focusKeyword') as string | null;
     
     let imageUrl: string | undefined;
 
@@ -77,6 +78,7 @@ export async function createArticle(formData: FormData) {
         metaTitle: metaTitle || null, 
         metaDescription: metaDescription || null, 
         metaKeywords: metaKeywords || null, 
+        focusKeyword: focusKeyword || null,
         authorId: session.user.id,
       },
     });
@@ -135,6 +137,7 @@ export async function updateArticle(articleId: string, formData: FormData) {
     const metaTitle = formData.get('metaTitle') as string | null;
     const metaDescription = formData.get('metaDescription') as string | null;
     const metaKeywords = formData.get('metaKeywords') as string | null;
+    const focusKeyword = formData.get('focusKeyword') as string | null;
 
     if (!title || categories.length === 0 || !content || !slug) {
       return { success: false, error: "Title, at least one category, content, and slug are required." };
@@ -162,6 +165,7 @@ export async function updateArticle(articleId: string, formData: FormData) {
       metaTitle: metaTitle || null, 
       metaDescription: metaDescription || null, 
       metaKeywords: metaKeywords || null, 
+      focusKeyword: focusKeyword || null,
     };
 
     if (newImageUrl) {

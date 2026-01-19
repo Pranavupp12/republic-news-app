@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import { updateArticle } from "@/actions/newsActions";
 import type { Article } from '@prisma/client';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox"; // 1. Import Checkbox
+import { Checkbox } from "@/components/ui/checkbox"; 
 import { RichTextEditor } from './RichTextEditor'; 
 import { Loader2 } from "lucide-react";
 import { ARTICLE_CATEGORIES } from '@/lib/constants';
@@ -44,9 +44,10 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [content, setContent] = useState('');
-  
-  // 2. Change state to Array
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+  // 1. ADDED FOCUS KEYWORD STATE
+  const [focusKeyword, setFocusKeyword] = useState('');
 
   // Sync prop to local state when the modal opens/article changes
   useEffect(() => {
@@ -54,13 +55,13 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
       setTitle(article.title);
       setSlug(article.slug || '');
       setContent(article.content);
-      setImageSource('url'); 
+      setImageSource('url');
+      // 2. LOAD FOCUS KEYWORD
+      setFocusKeyword(article.focusKeyword || '');
       
-      // 3. Safely load categories (Handle both Array and legacy String data)
       if (Array.isArray(article.category)) {
         setSelectedCategories(article.category);
       } else if (typeof article.category === 'string') {
-        // Fallback for old data not yet migrated
         setSelectedCategories([article.category]);
       } else {
         setSelectedCategories([]);
@@ -74,12 +75,11 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
     setSlug(slugify(newTitle)); 
   };
 
-  // 4. Handle Checkbox Toggles
   const handleCategoryToggle = (cat: string) => {
     setSelectedCategories((prev) => 
       prev.includes(cat) 
-        ? prev.filter((c) => c !== cat) // Uncheck
-        : [...prev, cat] // Check
+        ? prev.filter((c) => c !== cat) 
+        : [...prev, cat] 
     );
   };
 
@@ -89,12 +89,12 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
     event.preventDefault();
     setIsSubmitting(true);
     
-    // 5. FormData automatically captures inputs with name="category" (the checkboxes)
+    // FormData automatically captures all inputs with 'name' attributes
     const formData = new FormData(event.currentTarget);
     formData.set('content', content); 
     
-    // REMOVED: formData.set('category', category); 
-    // We let the native checkboxes handle the multiple values.
+    // The native checkboxes will be collected as multiple 'category' entries by the browser
+    // The native 'focusKeyword' input will be collected automatically because it has name="focusKeyword"
 
     const result = await updateArticle(article.id, formData);
 
@@ -135,7 +135,7 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
               <p className="text-xs text-muted-foreground">e.g., /article/{slug}</p>
             </div>
 
-            {/* 6. Replace Select with Checkbox Grid */}
+            {/* Categories */}
             <div className="space-y-3">
               <Label>Categories (Select at least one)</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 border p-4 rounded-md">
@@ -143,7 +143,7 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
                   <div key={cat} className="flex items-center space-x-2">
                     <Checkbox 
                       id={`update-cat-${cat}`} 
-                      name="category" // Essential for FormData
+                      name="category" 
                       value={cat}
                       checked={selectedCategories.includes(cat)}
                       onCheckedChange={() => handleCategoryToggle(cat)}
@@ -195,6 +195,18 @@ export function UpdateNewsModal({ article, isOpen, onClose }: UpdateNewsModalPro
                 <Input id="imageFile" name="imageFile" type="file" accept="image/*" />
               </div>
             )}
+
+            {/* 3. ADDED FOCUS KEYWORD FIELD */}
+            <div className="space-y-2 pt-4 border-t mt-4">
+                <Label htmlFor="focusKeyword" className="text-blue-600 font-semibold">Focus Keyword</Label>
+                <Input 
+                    id="focusKeyword" 
+                    name="focusKeyword" 
+                    value={focusKeyword} 
+                    onChange={(e) => setFocusKeyword(e.target.value)}
+                    placeholder="Updated focus keyword" 
+                />
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="metaTitle">Meta Title (SEO)</Label>

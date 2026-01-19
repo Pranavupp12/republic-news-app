@@ -16,7 +16,7 @@ interface FeaturedArticleCardProps {
   priority?: boolean;
 }
 
-export function FeaturedArticleCard({ article, priority = false }: FeaturedArticleCardProps) {
+export function FeaturedArticleCard({ article }: FeaturedArticleCardProps) {
   const [formattedTime, setFormattedTime] = useState('');
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export function FeaturedArticleCard({ article, priority = false }: FeaturedArtic
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover "
-            priority={priority} 
+            priority={true} 
           />
         </Link>
         

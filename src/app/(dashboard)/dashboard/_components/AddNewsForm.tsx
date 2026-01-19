@@ -32,7 +32,7 @@ export function AddNewsForm() {
   const [content, setContent] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   
-  // SEO Fields (State managed for character counts)
+  // SEO Fields
   const [focusKeyword, setFocusKeyword] = useState('');
   const [metaTitle, setMetaTitle] = useState('');
   const [metaDesc, setMetaDesc] = useState('');
@@ -56,20 +56,17 @@ export function AddNewsForm() {
     const form = event.currentTarget;
     const formData = new FormData(form);
 
-    // 1. Manually set Content & SEO (You already have this)
+    // 1. Explicitly Set Custom Fields (React State -> FormData)
     formData.set('content', content);
+    formData.set('imageSource', imageSource);
+    
+    // SEO Fields
     formData.set('metaTitle', metaTitle);
     formData.set('metaDescription', metaDesc);
     formData.set('metaKeywords', metaKeywords);
-    formData.set('focusKeyword', focusKeyword);
+    formData.set('focusKeyword', focusKeyword); // Saved to DB
 
-    // 2. FIX: Manually set Image Source (React State -> FormData)
-    // The server needs to know if it's 'url' or 'upload' to check the right field
-    formData.set('imageSource', imageSource); 
-
-    // 3. FIX: Manually append Categories (React State -> FormData)
-    // Shadcn checkboxes are not native inputs, so FormData ignores them by default.
-    // We loop through the array and append each one.
+    // Categories (Checkbox Logic)
     selectedCategories.forEach((cat) => {
       formData.append('category', cat);
     });
@@ -218,6 +215,7 @@ export function AddNewsForm() {
                     title={title}
                     metaTitle={metaTitle}
                     metaDesc={metaDesc}
+                    metaKeywords={metaKeywords}
                 />
 
                 {/* Submit Button (Placed here for easy access on right sidebar) */}

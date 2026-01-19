@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,6 +9,7 @@ import type { Article, User } from '@prisma/client';
 import { UpdateNewsModal } from './UpdateNewsModal';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 import { FeaturedToggleButton } from './FeaturedToggleButton';
+import { CheckSeoModal } from './CheckSeoModal'; // 1. IMPORT NEW MODAL
 import {
   Tooltip,
   TooltipContent,
@@ -16,8 +17,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { TrendingToggleButton } from './TrendingToggleButton';
-import { SendNotificationButton } from './SendNotificationButton'; // Import the button
+import { SendNotificationButton } from './SendNotificationButton'; 
 import { Badge } from '@/components/ui/badge';
+import Link from 'next/link'; // 2. IMPORT LINK
+import { Eye, ScanSearch, Pencil, Trash2 } from 'lucide-react'; // 3. IMPORT ICONS
 
 type ArticleWithAuthor = Article & {
   author: User | null;
@@ -41,11 +44,17 @@ const truncateText = (text: string, wordLimit: number) => {
 };
 
 export function NewsDataTable({ articles, currentPage, articlesPerPage, isTodayFilterActive, trendingCount }: NewsDataTableProps) {
+  // Update Modal State
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [articleToUpdate, setArticleToUpdate] = useState<Article | null>(null);
 
+  // Delete Modal State
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [articleToDelete, setArticleToDelete] = useState<Article | null>(null);
+
+  // 4. NEW: SEO Modal State
+  const [isSeoModalOpen, setIsSeoModalOpen] = useState(false);
+  const [articleToAnalyze, setArticleToAnalyze] = useState<Article | null>(null);
 
   const handleOpenUpdateModal = (article: Article) => {
     setArticleToUpdate(article);
@@ -64,6 +73,17 @@ export function NewsDataTable({ articles, currentPage, articlesPerPage, isTodayF
     setIsDeleteModalOpen(false);
     setArticleToDelete(null);
   };
+
+  // 5. NEW: SEO Handler
+  const handleOpenSeoModal = (article: Article) => {
+    setArticleToAnalyze(article);
+    setIsSeoModalOpen(true);
+  }
+  const handleCloseSeoModal = () => {
+    setIsSeoModalOpen(false);
+    setArticleToAnalyze(null);
+  }
+
   const handleConfirmDelete = async () => {
     if (!articleToDelete) return;
     const result = await deleteArticle(articleToDelete.id);
@@ -75,7 +95,6 @@ export function NewsDataTable({ articles, currentPage, articlesPerPage, isTodayF
     handleCloseDeleteModal();
   };
 
-  // Calculate the starting serial number for the current page
   const serialNumberOffset = (currentPage - 1) * articlesPerPage;
 
   return (
@@ -98,10 +117,8 @@ export function NewsDataTable({ articles, currentPage, articlesPerPage, isTodayF
             {articles.length > 0 ? (
               articles.map((article, index) => (
                 <TableRow key={article.id}>
-                  {/* Serial Number */}
                   <TableCell className="font-medium">{serialNumberOffset + index + 1}</TableCell>
 
-                  {/* Title with Tooltip */}
                   <TableCell>
                     <TooltipProvider>
                       <Tooltip>
@@ -115,49 +132,79 @@ export function NewsDataTable({ articles, currentPage, articlesPerPage, isTodayF
                     </TooltipProvider>
                   </TableCell>
 
-                  {/* Category */}
-                  <TableCell>{article.category.map((cat, index) => (
-                    <div key={index} className="inline-block mr-2 mb-1">
-                      <Badge key={index} variant="secondary" className="text-xs ">
-                      {cat}
-                    </Badge>
+                  <TableCell>{article.category.map((cat, idx) => (
+                    <div key={idx} className="inline-block mr-2 mb-1">
+                      <Badge variant="secondary" className="text-xs">{cat}</Badge>
                     </div>
-                    
                   ))}</TableCell>
 
-                  {/* Feature Toggles (Hidden on 'Today' filter) */}
                   {!isTodayFilterActive && (
-                    <TableCell>
-                      <FeaturedToggleButton article={article} />
-                    </TableCell>
+                    <TableCell><FeaturedToggleButton article={article} /></TableCell>
                   )}
                   {!isTodayFilterActive && (
-                    <TableCell>
-                      <TrendingToggleButton article={article} trendingCount={trendingCount} />
-                    </TableCell>
+                    <TableCell><TrendingToggleButton article={article} trendingCount={trendingCount} /></TableCell>
                   )}
 
-                  {/* Author & Date */}
                   <TableCell>{article.author?.name || 'N/A'}</TableCell>
-                  <TableCell>
-                    {new Date(article.createdAt).toLocaleDateString('en-IN')}
-                  </TableCell>
+                  <TableCell>{new Date(article.createdAt).toLocaleDateString('en-IN')}</TableCell>
 
                   {/* ACTIONS COLUMN */}
                   <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      {/* 1. Notification Button */}
+                    <div className="flex items-center justify-end gap-1">
+                      
+                      {/* A. VIEW BUTTON (Eye Icon) */}
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" asChild className="h-8 w-8">
+                              {/* Using Next Link to navigate */}
+                              <Link href={`/article/${article.slug}`} target="_blank">
+                                <Eye className="h-4 w-4 text-blue-600" />
+                              </Link>
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>View Article</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+
+                      {/* B. CHECK SEO BUTTON (Scan Icon) */}
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenSeoModal(article)}>
+                                <ScanSearch className="h-4 w-4 text-purple-600" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Check SEO</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+
+                      {/* C. Notification */}
                       <SendNotificationButton article={article} />
 
-                      {/* 2. Update Button */}
-                      <Button variant="outline" size="sm" onClick={() => handleOpenUpdateModal(article)}>
-                        Update
-                      </Button>
+                      {/* D. Update Button */}
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenUpdateModal(article)}>
+                                <Pencil className="h-4 w-4 text-slate-600" />
+                             </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Edit</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
 
-                      {/* 3. Delete Button */}
-                      <Button variant="destructive" size="sm" onClick={() => handleOpenDeleteModal(article)}>
-                        Delete
-                      </Button>
+                      {/* E. Delete Button */}
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenDeleteModal(article)}>
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                             </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Delete</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -173,9 +220,11 @@ export function NewsDataTable({ articles, currentPage, articlesPerPage, isTodayF
         </Table>
       </div>
 
-      {/* Modals live outside the table to prevent layout issues */}
       <UpdateNewsModal article={articleToUpdate} isOpen={isUpdateModalOpen} onClose={handleCloseUpdateModal} />
       <DeleteConfirmationModal isOpen={isDeleteModalOpen} onClose={handleCloseDeleteModal} onConfirm={handleConfirmDelete} />
+      
+      {/* 6. RENDER NEW SEO MODAL */}
+      <CheckSeoModal article={articleToAnalyze} isOpen={isSeoModalOpen} onClose={handleCloseSeoModal} />
     </>
   );
 }
