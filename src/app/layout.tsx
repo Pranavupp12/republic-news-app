@@ -28,6 +28,14 @@ export const metadata: Metadata = {
     default: 'Republic News - Your Source for US News',
   },
   description: 'Your daily source for breaking news and headlines from the United States.',
+  icons: {
+    icon: [
+      { url: '/logo/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/logo/rn-logo.svg', type: 'image/svg+xml' }, 
+    ],
+    shortcut: '/logo/icon-192x192.png',
+    apple: '/logo/icon-192x192.png', // For iPhones/iPads
+  },
   manifest: '/manifest.json',
   keywords: ['us news', 'american news', 'republic news', 'headlines', 'politics'],
   robots: {
