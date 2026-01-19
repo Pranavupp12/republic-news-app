@@ -4,6 +4,7 @@ import "./globals.css";
 import AuthProvider from "./context/AuthProvider";
 import { Toaster } from "sonner";
 import Script from "next/script";
+import { Partytown } from '@builder.io/partytown/react';
 
 // --- OPTIMIZE FONTS ---
 const inter = Inter({
@@ -45,13 +46,16 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <Partytown debug={true} forward={['dataLayer.push']} />
+      </head>
       {/* 3. Add both font variables to the body */}
       <body className={`${inter}`}>
         <Script
-          strategy="lazyOnload"
+          strategy="worker"
           src="https://www.googletagmanager.com/gtag/js?id=G-NQ8YSKL9YG"
         />
-        <Script id="google-analytics" strategy="lazyOnload">
+        <Script id="google-analytics" strategy="worker">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
