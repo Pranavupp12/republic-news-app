@@ -48,7 +48,7 @@ export function FeaturedArticleCard({ article }: FeaturedArticleCardProps) {
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover "
             fetchPriority='high'
-            loading="lazy"
+            loading="eager"
           />
         </Link>
         
