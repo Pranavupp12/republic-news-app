@@ -4,7 +4,7 @@ import "./globals.css";
 import AuthProvider from "./context/AuthProvider";
 import { Toaster } from "sonner";
 import Script from "next/script";
-import { Partytown } from '@builder.io/partytown/react';
+import { Partytown } from '@qwik.dev/partytown/react';
 
 // --- OPTIMIZE FONTS ---
 const inter = Inter({

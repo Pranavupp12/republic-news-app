@@ -3,38 +3,46 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils'; 
-import { ARTICLE_CATEGORIES } from '@/lib/constants'; // 1. Import constants
+import { ARTICLE_CATEGORIES } from '@/lib/constants'; 
 
 export function HeaderNav() {
   const pathname = usePathname();
 
-  // 2. dynamically build the links array
   const navLinks = [
     { href: '/', name: 'Home' },
     ...ARTICLE_CATEGORIES.map((category) => ({
-      href: `/category/${category}`, // Matches your existing URL structure
+      href: `/category/${category}`,
       name: category,
     })),
     { href: '/web-stories', name: 'Web Stories' },
   ];
 
   return (
-    <div className="md:flex gap-x-6">
+    <div className="md:flex gap-x-6"> {/* Increased gap slightly for better spacing */}
       {navLinks.map((link) => {
-        // Simple check: exact match OR if it's a category link that matches the start
-        // (This helps keep the active state accurate)
         const isActive = pathname === link.href;
         
         return (
           <Link
             key={link.name}
             href={link.href}
+            // 1. Add 'group' and 'relative' to the parent Link
             className={cn(
-              "text-sm p-1 md:p-0 font-medium transition-colors hover:text-red-500 ",
-              isActive ? "text-red-500" : "text-muted-foreground" // Changed 'text-red-300' to standard muted, or keep red-300 if you prefer
+              "relative group flex items-center h-full text-sm font-medium transition-colors hover:text-red-500",
+              isActive ? "text-red-600" : "text-muted-foreground"
             )}
           >
             {link.name}
+            
+            {/* 2. The Animated Underline Span */}
+            <span 
+                className={cn(
+                    "absolute bottom-[-16px]  left-0 w-full h-[3px] bg-red-500 transition-transform duration-300 ease-out origin-center",
+                    // If active, keep it scaled to 100%. If not, scale to 0 (invisible).
+                    // On hover (group-hover), scale to 100%.
+                    isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                )}
+            />
           </Link>
         );
       })}

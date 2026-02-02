@@ -58,7 +58,6 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  nextScriptWorkers: true,
 
 };
 

@@ -29,7 +29,7 @@ export function EntertainmentCarousel({ articles }: EntertainmentCarouselProps) 
   if (articles.length === 0) return null;
 
   return (
-    <section className="w-full bg-white border-t border-b border-black py-8 my-10 overflow-hidden">
+    <section className="w-full bg-white border-t border-b border-black py-8 my-0 lg:my-10 overflow-hidden">
       <div className="px-4">
         
         <Carousel
@@ -41,7 +41,7 @@ export function EntertainmentCarousel({ articles }: EntertainmentCarouselProps) 
         >
           {/* Header Section */}
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl md:text-3xl font-bold font-heading text-black">
+            <h2 className="text-3xl font-medium font-heading text-black">
               Entertainment
             </h2>
 

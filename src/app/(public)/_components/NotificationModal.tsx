@@ -42,7 +42,7 @@ export function NotificationModal() {
 
     if (!isPermissionGranted && !hasSeenModal) {
       // Wait a few seconds before showing to not be annoying immediately
-      const timer = setTimeout(() => setIsOpen(true), 3000);
+      const timer = setTimeout(() => setIsOpen(true), 5000); // Increased slightly to 5s for better UX
       return () => clearTimeout(timer);
     }
   }, []);
@@ -87,29 +87,42 @@ export function NotificationModal() {
   
   const handleClose = () => {
     setIsOpen(false);
-    // Remember that user closed it so we don't ask again (per new user rule)
+    // Remember that user closed it so we don't ask again
     localStorage.setItem('notificationModalSeen', 'true');
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <div className="mx-auto bg-red-100 p-3 rounded-full w-fit mb-2">
-            <BellRing className="h-6 w-6 text-red-600" />
+      <DialogContent className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-none border-t-4 border-t-red-600 bg-white shadow-xl">
+        
+        <DialogHeader className="p-8 pb-2 items-center">
+          {/* Sharp Icon Container */}
+          <div className="bg-red-50 p-3 w-fit mb-4 flex items-center justify-center border border-red-100">
+            <BellRing className="h-6 w-6 text-red-700" />
           </div>
-          <DialogTitle className="text-center">Enable Notifications?</DialogTitle>
-          <DialogDescription className="text-center">
-            Get instant updates on breaking news, tech trends, and fresh stories. 
-            We promise not to spam!
+          
+          <DialogTitle className="text-xl font-bold text-center font-heading tracking-tight text-neutral-900">
+            Stay Ahead of the Story
+          </DialogTitle>
+          
+          <DialogDescription className="text-center text-neutral-500 mt-2 leading-relaxed text-sm">
+            Enable notifications to receive real-time updates on breaking news, in-depth analysis, and essential daily briefings.
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter className="sm:justify-center gap-2">
-          <Button variant="outline" onClick={handleClose}>
-            No, thanks
+
+        <DialogFooter className="p-8 pt-6 flex-col sm:flex-row gap-3 sm:justify-center w-full">
+          <Button 
+            variant="outline" 
+            onClick={handleClose}
+            className="rounded-none border-neutral-300 text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 w-full sm:w-auto font-medium"
+          >
+            Maybe Later
           </Button>
-          <Button onClick={handleSubscribe} className="bg-red-600 hover:bg-red-700">
-            Yes, notify me
+          <Button 
+            onClick={handleSubscribe} 
+            className="rounded-none bg-red-600 hover:bg-red-700 hover:text-white text-white w-full sm:w-auto font-medium shadow-sm"
+          >
+            Enable Notifications
           </Button>
         </DialogFooter>
       </DialogContent>

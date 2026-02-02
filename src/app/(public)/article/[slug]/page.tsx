@@ -4,17 +4,32 @@ import Image from "next/image";
 import type { Metadata } from 'next';
 import { format } from 'date-fns-tz';
 import Script from 'next/script'; 
+import { RelatedArticles } from "../../_components/RelatedArticle";
+import { Suspense } from "react";
+import { RelatedArticlesSkeleton } from "@/components/skeletons/RelatedArticleSkeleton";
+import { unstable_cache } from "next/cache"; // 1. Import
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;
 }
 
-// --- 1. SEO & SOCIAL METADATA ---
+// --- 2. CACHED DATA FETCHER ---
+// This is the most important one to cache as it gets hit by every SEO bot and user
+const getCachedArticle = unstable_cache(
+  async (slug: string) => {
+    return await prisma.article.findUnique({
+      where: { slug },
+      include: { author: true },
+    });
+  },
+  ['single-article-content'], // Key name
+  { revalidate: 60 } // Cache for 60 seconds
+);
+
 export async function generateMetadata(props: ArticlePageProps): Promise<Metadata> {
   const params = await props.params;
-  const article = await prisma.article.findUnique({
-    where: { slug: params.slug },
-  });
+  // Use cached function
+  const article = await getCachedArticle(params.slug);
 
   if (!article) {
     return { title: 'Article Not Found' };
@@ -60,16 +75,14 @@ export async function generateMetadata(props: ArticlePageProps): Promise<Metadat
 
 export default async function ArticlePage(props: ArticlePageProps) {
   const params = await props.params;
-  const article = await prisma.article.findUnique({
-    where: { slug: params.slug },
-    include: { author: true },
-  });
+  
+  // Use cached function
+  const article = await getCachedArticle(params.slug);
 
   if (!article) {
     notFound();
   }
 
-  // --- HELPER: Normalize Categories ---
   const categories = Array.isArray(article.category) 
     ? article.category 
     : (article.category ? [article.category] : []);
@@ -79,7 +92,6 @@ export default async function ArticlePage(props: ArticlePageProps) {
   const datePublished = new Date(article.createdAt).toISOString();
   const dateModified = new Date(article.updatedAt).toISOString();
 
-  // --- 2. STRUCTURED DATA (JSON-LD) ---
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
@@ -109,49 +121,60 @@ export default async function ArticlePage(props: ArticlePageProps) {
   };
 
   return (
-    <main className="container mx-auto py-10 px-8 lg:px-4 max-w-5xl">
+    <main className="container mx-auto py-8 lg:py-12 px-4 lg:px-0 max-w-6xl">
       <Script
         id="json-ld-article"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <article>
-        {/* --- UPDATED: Categories as Text (Red, Bold, Uppercase) --- */}
-        {categories.length > 0 && (
-          <div className="text-sm md:text-base font-bold text-red-500 uppercase tracking-wider mb-3">
-            {categories.join(" • ")}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <article className="lg:col-span-8">
+          {categories.length > 0 && (
+            <div className="text-sm md:text-base font-bold text-red-500 uppercase tracking-wider mb-3">
+              {categories.join(" • ")}
+            </div>
+          )}
+
+          <h1 className="text-3xl lg:text-5xl font-extrabold font-heading tracking-tight mb-4 leading-tight">
+            {article.title}
+          </h1>
+
+          <div className="text-md md:text-lg text-black mb-6 sm:mb-8 font-medium">
+            <span className="uppercase text-black font-bold">{article.author?.name || 'Republic News '}</span>
+            <span className="mx-2 text-muted-foreground">|</span>
+            <time dateTime={isoDate} className="text-muted-foreground">
+              {dateString}
+            </time>
           </div>
-        )}
 
-        <h1 className="text-3xl lg:text-5xl font-extrabold font-heading tracking-tight mb-4 leading-tight">
-          {article.title}
-        </h1>
+          <div className="relative h-[280px] md:h-[500px] w-full mb-8 overflow-hidden rounded-lg bg-gray-100">
+            <Image
+              src={article.imageUrl}
+              alt={article.title}
+              fill
+              sizes="(max-width: 768px) 100vw, 800px"
+              className="object-cover"
+              priority 
+            />
+          </div>
 
-        <div className="text-md md:text-lg text-black mb-4 sm:mb-8 font-medium">
-          <span className="uppercase text-black font-bold">{article.author?.name || 'Republic News '}</span>
-          <span className="mx-2 text-muted-foreground">|</span>
-          <time dateTime={isoDate} className="text-muted-foreground">
-            {dateString}
-          </time>
-        </div>
-
-        <div className="relative h-[280px] md:h-[500px] lg:h-[620px] w-full mb-4 sm:mb-8 overflow-hidden">
-          <Image
-            src={article.imageUrl}
-            alt={article.title}
-            fill
-            sizes="(max-width: 768px) 100vw, 900px"
-            className="object-contain sm:object-cover"
-            priority 
+          <div
+            className="prose prose-lg dark:prose-invert max-w-none prose-img:rounded-xl prose-headings:font-heading prose-a:text-red-500 hover:prose-a:text-red-600 transition-colors"
+            dangerouslySetInnerHTML={{ __html: article.content }}
           />
-        </div>
+        </article>
 
-        <div
-          className="prose prose-lg dark:prose-invert max-w-none prose-img:rounded-xl prose-a:text-red-500 hover:prose-a:text-red-600 transition-colors"
-          dangerouslySetInnerHTML={{ __html: article.content }}
-        />
-      </article>
+        <aside className="lg:col-span-4">
+           <Suspense fallback={<RelatedArticlesSkeleton />}>
+              <RelatedArticles 
+                 currentArticleId={article.id} 
+                 categories={categories} 
+              />
+           </Suspense>
+        </aside>
+
+      </div>
     </main>
   );
 }

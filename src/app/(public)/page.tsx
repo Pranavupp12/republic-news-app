@@ -5,11 +5,13 @@ import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { FeaturedArticleCard } from "./_components/FeaturedArticleCard";
 import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image"; 
 import type { Metadata } from 'next';
 import { format } from 'date-fns-tz';
-import { unstable_cache } from "next/cache"; 
+import { unstable_cache } from "next/cache";
 import { EntertainmentCarousel } from "./_components/EntertainmentCarousel";
 import { DiscoverNewsLayout } from "./_components/DiscoverNewsLayout";
+import { cn } from "@/lib/utils"; // Make sure to import cn for conditional classes
 
 export const metadata: Metadata = {
   title: "Latest US News & Breaking Headlines",
@@ -20,17 +22,38 @@ export const metadata: Metadata = {
 const FEATURED_ARTICLES_COUNT = 7;
 const ARTICLES_PER_PAGE = 6;
 
-// --- 1. CACHED QUERY FOR HEADLINES (Smart Fill) ---
+// --- 1. CACHED QUERY FOR HEADLINES ---
 const getCachedHeadlines = unstable_cache(
   async () => {
-    return await prisma.article.findMany({
-      take: 3, 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const todaysArticles = await prisma.article.findMany({
+      where: { createdAt: { gte: today } },
       orderBy: { createdAt: 'desc' },
       include: { author: true },
+      take: 50,
     });
+
+    const MIN_HEADLINES = 5; 
+
+    if (todaysArticles.length < MIN_HEADLINES) {
+      const needed = MIN_HEADLINES - todaysArticles.length;
+
+      const olderBackfill = await prisma.article.findMany({
+        where: { createdAt: { lt: today } },
+        orderBy: { createdAt: 'desc' },
+        include: { author: true },
+        take: needed,
+      });
+
+      return [...todaysArticles, ...olderBackfill];
+    }
+
+    return todaysArticles;
   },
-  ['headlines-articles-main'],
-  { revalidate: 60 } 
+  ['headlines-articles-adaptive-v3'], // Bumped key
+  { revalidate: 60 }
 );
 
 // --- 2. CACHED QUERY FOR FEATURED OLDER ARTICLES ---
@@ -40,7 +63,7 @@ const getCachedFeaturedOlderArticles = unstable_cache(
       take: FEATURED_ARTICLES_COUNT,
       where: {
         isFeatured: true,
-        id: { notIn: excludeIds } 
+        id: { notIn: excludeIds }
       },
       orderBy: { createdAt: 'desc' },
       include: { author: true },
@@ -70,7 +93,7 @@ const getCachedEntertainmentArticles = unstable_cache(
       where: {
         category: { has: 'Entertainment' }
       },
-      take: 10, 
+      take: 10,
       orderBy: { createdAt: 'desc' },
       include: { author: true },
     });
@@ -80,7 +103,7 @@ const getCachedEntertainmentArticles = unstable_cache(
 );
 
 interface HomePageProps {
-  searchParams: Promise<{ page?: string }>; 
+  searchParams: Promise<{ page?: string }>;
 }
 
 export default async function HomePage(props: HomePageProps) {
@@ -90,38 +113,37 @@ export default async function HomePage(props: HomePageProps) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // --- STEP 1: Fetch Headlines First ---
   const headlinesData = await getCachedHeadlines();
-  
-  // Extract IDs to exclude from other lists
   const headlineIds = headlinesData.map(article => article.id);
 
-  // --- STEP 2: Fetch Other Data in Parallel ---
+  // --- SPLIT LOGIC ---
+  const firstTwoHeadlines = headlinesData.slice(0, 2);
+  const middleTwoGrid = headlinesData.slice(2, 4);
+  const remainingHeadlines = headlinesData.slice(4);
+
   const [featuredOlderArticles, trendingArticles, entertainmentArticles] = await Promise.all([
     getCachedFeaturedOlderArticles(headlineIds),
     getCachedTrendingArticles(),
     getCachedEntertainmentArticles()
   ]);
 
-  // --- FIX: Exclude Headline IDs from Discover More Count ---
   const totalPaginatedArticles = await prisma.article.count({
     where: {
       isFeatured: { not: true },
       createdAt: { lt: today },
-      id: { notIn: headlineIds } // <--- Added this exclusion
+      id: { notIn: headlineIds }
     }
   });
 
   const totalPages = Math.ceil(Math.max(0, totalPaginatedArticles) / ARTICLES_PER_PAGE);
 
-  // --- FIX: Exclude Headline IDs from Discover More List ---
   const paginatedOlderArticles = await prisma.article.findMany({
     take: ARTICLES_PER_PAGE,
     skip: (Number(page) - 1) * ARTICLES_PER_PAGE,
     where: {
       isFeatured: { not: true },
       createdAt: { lt: today },
-      id: { notIn: headlineIds } // <--- Added this exclusion
+      id: { notIn: headlineIds }
     },
     orderBy: { createdAt: 'desc' },
     include: { author: true },
@@ -129,122 +151,89 @@ export default async function HomePage(props: HomePageProps) {
 
   return (
     <main className="container mx-auto py-4 lg:py-10 px-4 lg:px-0">
-      {/* --- TOP SECTION --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
 
-        {/* --- LEFT COLUMN: FEATURED & TRENDING --- */}
-        <div className="lg:col-span-1 order-2 lg:order-1">
-          <Card className="border-none">
-            <CardContent className="px-4 pt-5 pb-5">
-              <h2 className="text-2xl text-black font-semibold font-heading mb-2 block lg:hidden">
-                more news
-              </h2>
-              <div className="space-y-4 max-h-[485px] overflow-y-auto hide-scrollbar pr-2">
-                {featuredOlderArticles.length > 0 ? (
-                  featuredOlderArticles.map((article, index) => {
-                    const categories = Array.isArray(article.category)
-                      ? article.category
-                      : article.category
-                        ? [article.category]
-                        : [];
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-0 sm:gap-8">
 
-                    return (
-                      <div key={article.id}>
-                        <Link href={`/article/${article.slug}`} className="block group">
-
-                          {categories.length > 0 && (
-                            <div className="text-xs font-bold text-red-500 uppercase tracking-wider mb-2">
-                              {categories.join(" • ")}
-                            </div>
-                          )}
-
-                          <h3 className="font-bold font-heading group-hover:underline decoration-red-500 underline-offset-4 decoration-2 mb-2">
-                            {article.title}
-                          </h3>
-
-                          <p className="text-xs mt-1">
-                            <span className="uppercase text-black font-bold">{article.author?.name || "Anonymous"}</span>
-                            <span className="mx-2 text-muted-foreground">|</span>
-                            <span>
-                              {format(
-                                new Date(article.createdAt),
-                                "MMM d, yyyy, h:mm a",
-                                {
-                                  timeZone:
-                                    Intl.DateTimeFormat().resolvedOptions().timeZone,
-                                }
-                              )}
-                            </span>
-                          </p>
-                        </Link>
-                        {index < featuredOlderArticles.length - 1 && (
-                          <Separator className="mt-4" />
-                        )}
-                      </div>
-                    );
-                  })
-                ) : (
-                  <p className="text-sm text-muted-foreground">No featured articles.</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="mt-6 border-0 border-t border-gray-200 shadow-none">
-            <CardContent className="px-0 pt-6 pb-5">
-              <h2 className="text-xl font-bold font-heading mb-4 px-4 flex items-center gap-2">
-                <span className="text-red-600">Trending</span> Now
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-5 h-5 text-red-600"
-                >
-                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                  <polyline points="17 6 23 6 23 12" />
-                </svg>
-              </h2>
-
-              <div className="flex flex-col">
-                {trendingArticles.length > 0 ? (
-                  trendingArticles.map((article, index) => (
-                    <Link
-                      key={article.id}
-                      href={`/article/${article.slug}`}
-                      className="group flex items-start gap-3 py-3 px-4 hover:bg-slate-50 transition-colors border-l-2 border-transparent hover:border-red-500"
-                    >
-                      <span className="text-2xl font-black text-gray-200 group-hover:text-red-500/50 transition-colors -mt-1 leading-none select-none">
-                        {index + 1}
-                      </span>
-                      <span className="font-medium text-gray-700 group-hover:text-red-600 transition-colors text-sm leading-snug">
-                        {article.trendingTopic}
-                      </span>
-                    </Link>
-                  ))
-                ) : (
-                  <p className="px-4 text-sm text-muted-foreground">
-                    No trending topics right now.
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* --- RIGHT COLUMN: HEADLINES --- */}
-        <div className="lg:col-span-2 order-1 lg:order-2">
-          <Card className="border-none">
-            <CardContent className="pt-5 pb-5">
-              <h1 className="text-3xl font-semibold font-heading mb-2 text-left px-4"><span className="text-red-500">Latest</span> Headlines</h1>
+        {/* --- LEFT COLUMN: HEADLINES (75% Width) --- */}
+        <div className="lg:col-span-3 order-1">
+          <Card className="border-none shadow-none">
+            <CardContent className="pt-5 pb-5 px-0">
+              <h1 className="text-3xl font-medium font-heading mb-6 text-left px-4">
+                <span className="text-red-500">Latest</span> Headlines
+              </h1>
+              
               {headlinesData.length > 0 ? (
                 <div className="space-y-8 max-h-[740px] overflow-y-auto hide-scrollbar">
-                  {headlinesData.map((article, index) => (
-                    <FeaturedArticleCard key={article.id} article={article} priority={index < 2} />
+                  
+                  {/* A. FIRST TWO LARGE CARDS */}
+                  {firstTwoHeadlines.map((article, index) => (
+                    <FeaturedArticleCard
+                      key={article.id}
+                      article={article}
+                      priority={true}
+                    />
                   ))}
+
+                  {/* B. THE BREAK: 2-COLUMN GRID (Updated) */}
+                  {middleTwoGrid.length > 0 && (
+                    <div className="px-4 py-2">
+                        {/* Removed border-y. Added gap-6. */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+                            {middleTwoGrid.map((article, index) => {
+                                const categories = Array.isArray(article.category) ? article.category : (article.category ? [article.category] : []);
+                                return (
+                                    <div 
+                                        key={article.id} 
+                                        className={cn(
+                                            "flex gap-4 items-start group",
+                                            // FIX: Add right border ONLY to the first item on desktop
+                                            index === 0 ? "md:border-r md:border-gray-200 md:pr-6" : ""
+                                        )}
+                                    >
+                                        {/* Image Left */}
+                                        <Link href={`/article/${article.slug}`} className="relative w-40 h-40 flex-shrink-0 overflow-hidden rounded-none">
+                                            <Image 
+                                                src={article.imageUrl || "https://placehold.co/200x200"}
+                                                alt={article.title}
+                                                fill
+                                                className="object-cover "
+                                                sizes="100px"
+                                            />
+                                        </Link>
+                                        
+                                        {/* Content Right */}
+                                        <div className="flex flex-col gap-1.5">
+                                            {/* FIX: Full categories joined by bullet */}
+                                            {categories.length > 0 && (
+                                                <span className="text-[10px] font-bold text-red-600 uppercase tracking-wider">
+                                                    {categories.join(" • ")}
+                                                </span>
+                                            )}
+                                            
+                                            <Link href={`/article/${article.slug}`}>
+                                                <h3 className="text-sm md:text-base font-bold font-heading leading-snug line-clamp-3 group-hover:underline decoration-red-500 underline-offset-4 decoration-2">
+                                                    {article.title}
+                                                </h3>
+                                            </Link>
+
+                                            {/* FIX: Removed timestamp */}
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </div>
+                  )}
+
+                  {/* C. REMAINING LARGE CARDS */}
+                  {remainingHeadlines.map((article) => (
+                    <FeaturedArticleCard
+                      key={article.id}
+                      article={article}
+                      priority={false}
+                    />
+                  ))}
+
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-full bg-muted/50 rounded-lg p-8">
@@ -257,16 +246,78 @@ export default async function HomePage(props: HomePageProps) {
           </Card>
         </div>
 
+        {/* --- RIGHT COLUMN: SIDEBAR (25% Width) --- */}
+        <div className="lg:col-span-1 order-2 flex flex-col gap-8">
+           
+           <Card className="border-none shadow-none">
+            <CardContent className="px-4 lg:px-0 pt-0 md:pt-22">
+              <div className="space-y-4 max-h-[485px] overflow-y-auto hide-scrollbar pr-1">
+                {featuredOlderArticles.length > 0 ? (
+                  featuredOlderArticles.map((article, index) => {
+                    const categories = Array.isArray(article.category) ? article.category : article.category ? [article.category] : [];
+                    return (
+                      <div key={article.id}>
+                        <Link href={`/article/${article.slug}`} className="block group">
+                          {categories.length > 0 && (
+                            <div className="text-[10px] font-bold text-red-500 uppercase tracking-wider mb-1">
+                              {categories.join(" • ")}
+                            </div>
+                          )}
+                          <h3 className="text-sm font-bold font-heading group-hover:underline decoration-red-500 underline-offset-4 decoration-2 mb-1 leading-snug">
+                            {article.title}
+                          </h3>
+                          <p className="text-[10px] text-muted-foreground">
+                            {format(new Date(article.createdAt), "MMM d, h:mm a")}
+                          </p>
+                        </Link>
+                        {index < featuredOlderArticles.length - 1 && <Separator className="mt-3" />}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-sm text-muted-foreground">No featured articles.</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none shadow-none mb-8">
+            <CardContent className="px-4 lg:px-0 pt-0 pb-5">
+              <h2 className="text-xl font-medium font-heading mb-4 flex items-center gap-2">
+                <span className="text-red-600">Trending</span> Now
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-red-600">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                  <polyline points="17 6 23 6 23 12" />
+                </svg>
+              </h2>
+              <div className="flex flex-col">
+                {trendingArticles.length > 0 ? (
+                  trendingArticles.map((article, index) => (
+                    <Link key={article.id} href={`/article/${article.slug}`} className="group flex items-start gap-3 py-3 hover:bg-slate-50 transition-colors border-l-2 border-transparent hover:border-red-500 pl-2">
+                      <span className="text-xl font-black text-gray-300 group-hover:text-red-500/50 transition-colors leading-none select-none">
+                        {index + 1}
+                      </span>
+                      <span className="font-medium text-gray-700 group-hover:text-red-600 transition-colors text-sm leading-snug line-clamp-2">
+                        {article.trendingTopic}
+                      </span>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground">No trending topics.</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
       </div>
 
-      {/* --- ENTERTAINMENT CAROUSEL --- */}
       <EntertainmentCarousel articles={entertainmentArticles} />
 
-      {/* --- DISCOVER MORE --- */}
       {paginatedOlderArticles.length > 0 && (
-        <section id="more-news" className="mt-8 mb-12">
-          <h2 className="text-3xl font-semibold font-heading text-black mb-4">
-            Discover More
+        <section id="more-news" className="mt-8 mb-12 px-4">
+          <h2 className="text-3xl font-medium font-heading text-black mb-4">
+            <span className="text-red-500">Discover</span> More
           </h2>
 
           {paginatedOlderArticles.length >= 5 ? (
