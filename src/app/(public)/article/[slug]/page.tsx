@@ -148,7 +148,7 @@ export default async function ArticlePage(props: ArticlePageProps) {
             </time>
           </div>
 
-          <div className="relative h-[280px] md:h-[500px] w-full mb-8 overflow-hidden rounded-lg bg-gray-100">
+          <div className="relative h-[280px] md:h-[500px] w-full mb-8 overflow-hidden rounded-none bg-gray-100">
             <Image
               src={article.imageUrl}
               alt={article.title}

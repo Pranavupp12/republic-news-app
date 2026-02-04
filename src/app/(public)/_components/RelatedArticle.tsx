@@ -39,8 +39,8 @@ export async function RelatedArticles({ currentArticleId, categories }: RelatedA
     <div className="sticky top-24"> 
       
       <div className="flex items-center gap-2 mb-6 border-b-2 border-red-500 pb-2">
-        <span className="text-lg font-bold uppercase tracking-wider text-black">
-          Related Stories
+        <span className="text-lg font-semibold tracking-wider text-black">
+          More Stories
         </span>
       </div>
 
@@ -73,7 +73,7 @@ export async function RelatedArticles({ currentArticleId, categories }: RelatedA
                      </span>
                    )}
 
-                   <h3 className="text-sm font-bold font-heading leading-snug group-hover:text-red-600 transition-colors line-clamp-3">
+                   <h3 className="text-sm font-bold font-heading leading-snug group-hover:underline decoration-red-500 underline-offset-4 decoration-2">
                      {item.title}
                    </h3>
                    

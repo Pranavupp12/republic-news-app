@@ -71,6 +71,7 @@ export function FeaturedArticleCard({ article, priority = false }: FeaturedArtic
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover"
             priority={priority}
+            fetchPriority='high'
           />
         </Link>
       </div>
